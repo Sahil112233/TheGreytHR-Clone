@@ -17,9 +17,6 @@ A responsive front-end clone of the GreytHR HR management dashboard built using 
 - JavaScript (DOM Manipulation)
 - Bootstrap (for grid system and components)
 
-## 📸 Preview
 
-> _Screenshots or live demo link can go here_
 
-## 📁 Folder Structure
 
