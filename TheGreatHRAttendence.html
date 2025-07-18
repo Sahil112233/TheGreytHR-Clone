@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertical Sidebar Menu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <!-- Link to External CSS -->
+    <style>
+       /* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+}
+
+body {
+    background-color: #fff;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 200px;
+    background-color: #fff;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    box-shadow: 5px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    transition: transform 0.3s ease;
+}
+
+.sidebar.active {
+    z-index: 15;
+}
+
+/* Back Button Container */
+#sidebar .back {
+    position: absolute; 
+    display: none;
+    top: 30px;
+    left: 75%; /* Moves the button just outside the sidebar, adjust as needed */
+    transform: translateX(10px) translateY(-50%); /* Adjusts positioning */
+}
+
+/* Back Button Styles */
+#sidebar .back-btn {
+    background: transparent !important; /* Make the background transparent */
+    border: none !important; /* Remove the border */
+    padding: 10px; /* Add padding to give space around the icon */
+    cursor: pointer; /* Make the button clickable */
+}
+
+/* Ion Icon Styles */
+#sidebar .back-btn ion-icon {
+    font-size: 30px; /* Adjust the size of the icon */
+    color: red; /* Set the default color to red */
+    transition: color 0.3s ease, transform 0.3s ease; /* Smooth transition for color and hover effects */
+}
+
+/* Hover Effect for Ion Icon */
+#sidebar .back-btn:hover ion-icon {
+    color: green; /* Change icon color on hover */
+    transform: scale(1.1); /* Slightly increase the size of the icon on hover */
+}
+
+/* Active/Focus Effect */
+#sidebar .back-btn:active ion-icon,
+#sidebar .back-btn:focus ion-icon {
+    color: green; /* Lighter color when the button is clicked or focused */
+    transform: scale(0.9); /* Slightly shrink the icon when clicked */
+}
+
+
+
+.sidebar .logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar .logo-img {
+    width: 100%;
+    max-width: 150px;
+}
+
+.sidebar .user {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.sidebar .user img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.sidebar .menu {
+    list-style: none;
+    padding: 0;
+    max-height: 80vh;
+    overflow-y: scroll;
+}
+
+.submenu li{
+    list-style-type: none; 
+}
+
+/* Hides the scrollbar in WebKit browsers (Chrome, Safari, Edge) */
+.sidebar .menu::-webkit-scrollbar {
+    display: none;
+}
+
+
+li::marker {
+    display: none;
+}
+
+
+.sidebar .menu li {
+    margin: 15px 0;
+}
+
+.sidebar .menu li a {
+    color: #677A8E;
+    text-decoration: none;
+    font-size: 15px;
+    padding-left: 5px;
+    display: block;
+    transition: color background 0.3s;
+}
+
+.sidebar .menu li a:hover {
+    font-weight: bold;
+    border-left: 2px solid #007bff;
+}
+
+.sidebar .submenu {
+    display: none;
+    border-left: 1px solid #677A8E;
+    margin-left: 20px;
+    padding-left: 20px;
+}
+
+
+/* Main Content */
+.main-content {
+    margin-left: 200px; /* Adjust margin to sidebar width */
+    width: calc(100% - 200px); /* Full width minus sidebar width */
+    transition: margin-left 0.3s ease;
+}
+
+/* Header Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 5;
+}
+
+.menu-toggle-btn {
+    font-size: 30px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: none;
+}
+
+.right-menu {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+}
+
+.right-menu .quick-links {
+    position: relative;
+}
+
+.right-menu .quick-links .dropdown-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 20px;
+}
+
+.right-menu .quick-links .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 10;
+}
+
+.right-menu .quick-links:hover .dropdown-menu {
+    display: block;
+}
+
+.right-menu .notification {
+    margin-left: 20px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.right-menu .logout {
+    margin-left: 20px;
+}
+
+.right-menu .logout a {
+    font-size: 20px;
+    color: #677A8E;
+    cursor: pointer;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.right-menu .logout a:hover {
+    font-weight: bold;
+}
+
+/* Content Container Styles */
+/* General Content Container Styles */
+#content {
+    padding: 20px;
+    width: calc(100% - 200px); /* Adjust for sidebar width */
+    margin-left: 180px; /* Ensures it starts after the sidebar width */
+    margin-top: 30px; /* Below the header */
+    height: 100%; /* Full-screen height minus header height */
+    
+}
+    
+
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-250px); /* Sidebar hidden on small screens */
+    }
+
+    .sidebar.active {
+        transform: translateX(0); /* Show sidebar when active */
+    }
+
+    .header {
+        width: 100%;
+    }
+
+    .main-content {
+        margin-left: 0; /* Remove margin-left on smaller screens */
+    }
+
+    .menu-toggle-btn {
+        display: block; /* Show the menu toggle button */
+    }
+
+    #sidebar .back{
+        display: block;
+    }
+    #content {
+        
+        margin-left: 0; /* No margin-left on small screens */
+        width: 100%; /* Full width content */
+    }
+    #content-container{
+        display: flex;
+        flex-wrap: wrap;
+    }
+}
+
+    </style>
+    
+ <style>
+.content-box {
+    margin-bottom: 20px;
+}
+
+.regularization-header {
+    text-align: right !important;
+    margin-bottom: 15px;
+}
+
+.regularization-header button {
+    font-size: 14px;
+    padding: 10px ;
+    background-color: #24a7f8;
+    border: #24a7f8;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.regularization-header button:hover {
+    background-color: #0056b3;
+}
+
+
+
+.card {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 170px;
+    margin-right: 10px;
+    height: 102px;
+    text-align: center;
+}
+
+.card .title {
+    font-size: 10px;
+    margin-bottom: 10px;
+    color: #7f8fa4;
+    border-bottom: 1px solid #bbb;
+}
+
+.card .value {
+    font-size: 16px;
+    padding-top: 10px;
+    color: #3b4452 !important;
+}
+
+.content-box {
+    margin-bottom: 20px;
+}
+
+.regularization-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.regularization-header button {
+    font-size: 16px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.regularization-header button:hover {
+    background-color: #0056b3;
+}
+
+.content-container {
+    display: flex;
+    
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.calendar-legends {
+    width: 100% !important;
+    height: 700px;
+    padding: 10px;
+    overflow: auto  ;
+}
+.calendar-legends::-webkit-scrollbar {
+    display: none; /* For WebKit browsers like Chrome, Safari, and newer versions of Edge */
+}
+
+.session-details {
+    width: 50%;
+    padding: 10px;
+}
+
+.calendar {
+  width: 600px;
+  left: 0 !important;
+  min-height: 400px;
+  border: 1px solid #666;
+  border-collapse: collapse;
+}
+
+.headline {
+  padding: 10px 0;
+  text-align: center;
+  position: relative;
+  color: #7f8fa4;
+  border-bottom: 1px solid #bbb;
+}
+
+.headline .month {
+  font-weight: bold;
+}
+
+.headline .divider {
+  color: #ad0;
+}
+
+.headline .year {
+  color: #bbb;
+}
+
+.headline .click-left,
+.headline .click-right {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.headline .click-left {
+  left: 5px;
+}
+
+.headline .click-right {
+  right: 5px;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+}
+
+.weekdays .day {
+  padding: 10px 0;
+  color: #7f8fa4;
+  border-right: 1px solid #cbd5e1;
+}
+
+.weekdays .day:last-child {
+  border-right: none;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+  padding: 5px;
+  border-top: 2px solid #bbb;
+}
+
+.date {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 82.4px;
+  height: 70px;
+  line-height: 40px;
+  border: 1px solid #cbd5e1;
+  color: #bbb;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.date.out-of-scope {
+  color: #555;
+}
+
+.date.selected {
+  color: #ad0;
+  border: 1px solid #ad0;
+}
+
+.date:hover {
+  background-color: #f0f0f0;
+}
+.container-legend {
+    width: 100%;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* General Status Row */
+.status-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+/* Common styling for all status items */
+.status-item {
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    color: #333; /* Default text color */
+    text-align: justify !;
+}
+
+/* Present */
+.status-present i {
+    font-size: 15px;
+    margin: 5px;
+    color: #4CAF50; /* Green color for Present */
+}
+
+.status-present {
+    font-size: 14px;
+    color: #4CAF50; /* Green color for Present */
+}
+
+/* Absent */
+.status-absent i {
+    margin: 5px;
+    font-size: 14px;
+    color: #FF5722; /* Orange color for Absent */
+}
+
+.status-absent {
+    font-size: 14px;
+    color: #FF5722; /* Orange color for Absent */
+}
+
+/* Off Day */
+.status-off-day i {
+    margin: 5px;
+    font-size: 14px;
+    color: #9E9E9E; /* Gray color for Off Day */
+}
+
+.status-off-day {
+    font-size: 14px;
+    color: #9E9E9E; /* Gray color for Off Day */
+}
+
+/* Rest Day */
+.status-rest-day i {
+    margin: 5px;
+    font-size: 14px;
+    color: #2196F3; /* Blue color for Rest Day */
+}
+
+.status-rest-day {
+    font-size: 14px;
+    color: #2196F3; /* Blue color for Rest Day */
+}
+
+/* Leave */
+.status-leave i {
+    margin: 5px;
+    font-size: 14px;
+    color: #FFEB3B; /* Yellow color for Leave */
+}
+
+.status-leave {
+    font-size: 14px;
+    color: #FFEB3B; /* Yellow color for Leave */
+}
+
+/* On Duty */
+.status-on-duty i {
+   
+    font-size: 14px;
+    color: #607D8B; /* Blue-Grey color for On Duty */
+}
+
+.status-on-duty {
+    font-size: 14px;
+    color: #607D8B; /* Blue-Grey color for On Duty */
+}
+
+/* Holiday */
+.status-holiday i {
+    margin: 5px;
+    font-size: 14px;
+    color: #FFC107; /* Amber color for Holiday */
+}
+
+.status-holiday {
+    font-size: 14px;
+    color: #FFC107; /* Amber color for Holiday */
+}
+
+/* Alert for Deduction */
+.status-alert-deduction i {
+    margin: 5px;
+    font-size: 14px;
+    color: #9C27B0; /* Purple color for Alert for Deduction */
+}
+
+.status-alert-deduction {
+    font-size: 14px;
+    color: #9C27B0; /* Purple color for Alert for Deduction */
+}
+
+/* Deduction */
+.status-deduction i {
+    margin: 5px;
+    font-size: 14px;
+    color: #D32F2F; /* Red color for Deduction */
+}
+
+.status-deduction {
+    font-size: 14px;
+    color: #D32F2F; /* Red color for Deduction */
+}
+
+/* Status Unknown */
+.status-unknown i {
+    margin: 5px;
+    font-size: 14px;
+    color: #757575; /* Grey color for Status Unknown */
+}
+
+.status-unknown {
+    font-size: 14px;
+    color: #757575; /* Grey color for Status Unknown */
+}
+
+/* Overtime */
+.status-overtime i {
+    margin: 5px;
+    font-size: 14px;
+    color: #8BC34A; /* Light Green color for Overtime */
+}
+
+.status-overtime {
+    font-size: 14px;
+    color: #8BC34A; /* Light Green color for Overtime */
+}
+
+/* Override */
+.status-override i {
+    margin: 5px;
+    font-size: 14px;
+    color: #00BCD4; /* Cyan color for Override */
+}
+
+.status-override {
+    font-size: 14px;
+    color: #00BCD4; /* Cyan color for Override */
+}
+
+/* Ignored */
+.status-ignored i {
+    margin: 5px;
+    font-size: 14px;
+    color: #757575; /* Orange color for Ignored */
+}
+
+.status-ignored {
+    font-size: 14px;
+    color: #FF9800; /* Orange color for Ignored */
+}
+
+/* Grace */
+.status-grace i {
+    margin: 5px;
+    font-size:14px;
+    color: #1309ac; /* Purple color for Grace */
+}
+
+.status-grace {
+    font-size: 14px;
+    color: #8E24AA; /* Purple color for Grace */
+}
+
+/* Regularized */
+.status-regularized i {
+    margin: 5px;
+    font-size: 14px;
+    color: rgb(206, 206, 4); /* Deep Purple color for Regularized */
+}
+
+.status-regularized {
+    font-size: 14px;
+    color: #673AB7; /* Deep Purple color for Regularized */
+}
+
+
+
+
+.status-row,
+.day-type-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+
+.status-item,
+.day-type-item {
+    color: #7f8fa4;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+
+
+h4.mb-4 {
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 20px;
+    color: #333;
+}
+
+h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.session-details {
+    width: 100%;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.session-details h4 {
+  margin-bottom: 20px;
+}
+
+.current-date{
+    display: flex;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    gap: 100px;
+    height: 90px;
+
+}
+.today{
+    border-right: 1px solid #3b4452;
+    width: 40px;
+}
+.current-date h3{
+    margin-bottom: 5px;
+}
+
+.current-date h2{
+    padding: 5px;
+    font-size: 14px;
+    columns: #3b4452;
+}
+.current-date p{
+    font-size: 12px;
+    color: #7f8fa4 ;
+    padding: 5px;
+}
+
+.process-table{
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    height: auto;
+}
+.process-table table{
+    width: 100%;
+}
+.process-table h5{
+    font-size: 12px;
+    color:#a3b2c7;
+    border-bottom: 1px solid #ddd;
+}
+.process-table th{
+    font-size: 12px;
+    padding: 5px;
+    color:#a3b2c7;
+    text-align: center;
+}
+.process-table td{
+    text-align: center;
+}
+
+.status-table{
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    height: auto;
+}
+.status-table table{
+    width: 100%;
+}
+.status-table h3{
+    font-size: 14px;
+    color:#a3b2c7;
+    border-bottom: 1px solid #ddd;
+}
+.status-table th{
+    font-size: 12px;
+    padding: 5px;
+    color:#a3b2c7;
+    text-align: center;
+}
+.status-table td{
+    text-align: center;
+}
+
+.session-table{
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    height: auto;
+}
+.session-table table{
+    width: 100%;
+}
+.session-table h4{
+    font-size: 14px;
+    text-align: left;
+    color:#a3b2c7;
+    border-bottom: 1px solid #ddd;
+}
+.session-table th{
+    font-size: 12px;
+    padding: 5px;
+    color:#a3b2c7;
+    text-align: center;
+}
+.session-table td{
+    text-align: center;
+    padding: 10px;
+    font-size: 12px;
+    color: #3b4452;
+}
+
+
+
+
+
+
+
+
+
+
+
+footer {
+            font-size: 12px;
+            background: transparent;
+            color: #7f8fa4;
+            text-align: center;
+            bottom: 0;
+        }
+
+footer a {
+            font-size: 12px;
+            color: #7f8fa4 ;
+            text-decoration: none;
+            margin: 0 ;
+        }
+
+ </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="header">
+            <!-- Menu toggle button -->
+            <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+        
+            <!-- Right-side menu with Quick Links, Notifications, and Logout -->
+            <div class="right-menu">
+                <!-- Quick Links dropdown button -->
+                <div class="quick-links">
+                    <button class="dropdown-btn">Quick Links ▼</button>
+                </div>
+        
+                <!-- Notifications icon -->
+                <div class="notification">
+                    <span><ion-icon name="notifications-outline"></ion-icon></span>
+                </div>
+        
+                <!-- Logout button -->
+                <div class="logout">
+                    <a href="GreatHRLogin.html"><ion-icon name="power-outline"></ion-icon></a>
+                </div>
+            </div>
+        </div>  
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <img src="./img/logoPRM.png" alt="Logo" class="logo-img">
+        </div>
+        <div class="back">
+            <button class="back-btn" onclick="toggleSidebar()">
+                <ion-icon name="arrow-back-circle-outline"></ion-icon>
+            </button>
+        </div>
+        <div class="flex flex-1 flex-col p-2x">
+            <!-- Profile Section -->
+            <div class="user px-2x pb-2x flex items-center" style="margin: 0;">
+                <img src="./img/profileimg.jpg" alt="Profile" width="40" height="40" style="border-radius: 50%; margin-right: 10px;">
+                <div class="flex-1" style="padding: 0;">
+                    <p class="text-center" style="font-size: 14px; margin-bottom: 0;">Hi Sahil</p>
+                    <a href="TheGreatHRprofile.html" class="text-center" style="font-size: 14px; margin-top: 0;">Visit Profile</a>
+                </div>
+                <a href="TheGreatHRSetting.html" style="font-size: 14px;">
+                    <ion-icon name="settings-outline"></ion-icon>
+                </a>
+            </div>
+        </div>
+        <ul class="menu">
+            <li><a href="TheGreatHRhome.html"><ion-icon name="home-outline"></ion-icon> Home</a></li>
+           
+            <li><a href="TheGreatHREngage.html"><ion-icon name="people-outline"></ion-icon> Engage</a></li>
+            
+            <li><a href="#"><ion-icon name="briefcase-outline"></ion-icon> My Worklife <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHrWorkLifekudo.html">Kudos</a></li>
+                    <li><a href="TheGreatHrWorklifeFeed.html">Feedback</a></li>
+                </ul>
+            </li>
+          
+            <li><a href="#"><ion-icon name="clipboard-outline"></ion-icon> To Do <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHrTodo.html">Review</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="wallet-outline"></ion-icon> Salary <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHRPayslips.html">Payslips</a></li>
+                    <li><a href="TheGreatHRYTD.html">YTD Reports</a></li>
+                    <li><a href="TheGreatHRITState.html">IT Statement</a></li>
+                    <li><a href="TheGreatHRITDeclaration.html">IT Declaration</a></li>
+                    <li><a href="TheGreatHRLoanAdvance.html">Loans and Advances</a></li>
+                    <li><a href="TheGreatHRReimbursement.html">Reimbursement</a></li>
+                    <li><a href="TheGreatHRProofOI.html">Proof Of Investment</a></li>
+                    <li><a href="TheGreatHRSalaryRevise.html">Salary Revision</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="bed-outline"></ion-icon> Leave <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHRLeaveApply.html">Leave Apply</a></li>
+                    <li><a href="TheGreatHRLeaveBalance.html">Leave Balances</a></li>
+                    <li><a href="TheGreatHRLeavecalender.html">Leave Calendar</a></li>
+                    <li><a href="TheGreatHRHolidayCalender.html">Holiday Calendar</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="pulse-outline"></ion-icon> Attendance <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHRAttendence.html">Attendance Info</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="document-text-outline"></ion-icon> Expense Claims</a></li>
+            <li><a href="TheGreatHRDocumentCenter.html"><ion-icon name="document-outline"></ion-icon> Document Center</a></li>
+            <li><a href="TheGreatHRHelpdesk.html"><ion-icon name="help-circle-outline"></ion-icon> Helpdesk</a></li>
+            <li><a href="TheGreatHRRequestHub.html"><ion-icon name="clipboard-outline"></ion-icon> Request Hub</a></li>
+            <li><a href="#"><ion-icon name="share-social-outline"></ion-icon> Workflow Delegates</a></li>
+        </ul>
+    </div>
+
+    <div class="content" id="content">
+
+        <div class="content-box">
+            <!-- Header with My Regularization Button -->
+            <div class="regularization-header"> <!-- Updated class name -->
+                <button>My Regularization</button>
+            </div>
+        </div>
+        
+        <!-- First Container with Flex for Work Hours and Penalty -->
+        <div class="container mt-4">
+    <!-- First Container with Flex for Work Hours and Penalty -->
+    <div class="content-container mb-4">
+        <div class="card text-center  shadow-sm" >
+            <div class="title h5 m-2">Avg. Work Hrs</div>
+            <div class="value text-primary">8.00 hrs</div>
+        </div>
+        <div class="card text-center  shadow-sm" >
+            <div class="title h5 m-2">Avg. Actual Work Hrs</div>
+            <div class="value text-primary">7.50 hrs</div>
+        </div>
+        <div class="card text-center  shadow-sm" >
+            <div class="title h5 m-2">Penalty Days</div>
+            <div class="value text-primary">2 Days</div>
+        </div>
+    </div>
+
+    <!-- Calendar and Legends Section -->
+    <div class="calendar-container d-flex ">
+        <!-- Left Side: Calendar and Legends Section -->
+        <div class="calendar-legends ">
+            <div class="calendar">
+              <div class="headline">
+                <span class="click-left"><ion-icon name="chevron-back"></ion-icon></span>
+                <span class="month">JANUARY</span>
+                <span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                <span class="year">2015</span>
+                <span class="click-right"><ion-icon name="chevron-forward"></ion-icon></span>
+              </div>
+              <div class="weekdays">
+                <div class="day">MON</div>
+                <div class="day">TUE</div>
+                <div class="day">WED</div>
+                <div class="day">THU</div>
+                <div class="day">FRI</div>
+                <div class="day">SAT</div>
+                <div class="day">SUN</div>
+              </div>
+              <div class="days">
+                <!-- Days will be generated here by JS -->
+              </div>
+            </div>
+            <div class="container-legend">
+                <h4 class="mb-4">Legend</h4>
+                
+                <!-- Row of elements under the h4 tag -->
+                <div class="status-row">
+                    <div class="status-item status-present"><i class="fa-solid fa-p"></i>Present</div>
+                    <div class="status-item status-absent"><i class="fa-solid fa-a"></i>Absent</div>
+                    <div class="status-item status-off-day"><i class="fa-solid fa-o"></i>Off Day</div>
+                    <div class="status-item status-rest-day"><i class="fa-solid fa-r"></i>Rest Day</div>
+                    <div class="status-item status-leave"><i class="fa-solid fa-l"></i>Leave</div>
+                    <div class="status-item status-on-duty" ><i class="fa-solid fa-o"></i><i class="fa-solid fa-d m-2"></i>On Duty</div>
+                    <div class="status-item status-holiday"><i class="fa-solid fa-h"></i>Holiday</div>
+                    <div class="status-item status-alert-deduction"><i class="fa-solid fa-square"></i>Alert for Deduction</div>
+                    <div class="status-item status-deduction"><i class="fa-solid fa-square"></i>Deduction</div>
+                    <div class="status-item status-unknown"><i class="fa-solid fa-question"></i>Status Unknown</div>
+                    <div class="status-item status-overtime"><i class="fa-regular fa-clock"></i>Overtime</div>
+                    <div class="status-item status-override"><i class="fa-regular fa-pen-to-square"></i>Override</div>
+                    <div class="status-item status-ignored"><i class="fa-solid fa-bookmark"></i>Ignored</div>
+                    <div class="status-item status-grace"><i class="fa-solid fa-bookmark"></i>Grace</div>
+                    <div class="status-item status-regularized"><i class="fa-solid fa-bookmark"></i>Regularized</div>
+                </div>
+                
+            
+                <!-- h3 for Day Type section -->
+                <h3>Day Type</h3>
+                
+                <!-- Row of elements under Day Type -->
+                <div class="day-type-row">
+                    <div class="day-type-item"><i class="fa-solid fa-mug-saucer"></i>Rest Day</div>
+                    <div class="day-type-item"><i class="fa-solid fa-tv"></i>Off Day</div>
+                    <div class="day-type-item"><i class="fa-solid fa-umbrella"></i>Holiday</div>
+                    <div class="day-type-item"><i class="fa-regular fa-square"></i>Half Day</div>
+                    <div class="day-type-item"><i class="fa-solid fa-bolt"></i>Plant Shutdown</div>
+                </div>
+            </div>
+            
+
+          </div>
+          
+
+        <!-- Right Side: Session Details Section -->
+        <div class="session-details p-3 " >
+            <div class="current-date">
+                <div class="m-2 today">
+                    <h3>07</h3> 
+                    <p>Fri</p>
+                </div>
+                <div >
+                    <h2>Dc General(DCGN)</h2>
+                    <p>Shift : 09:30 to 18:30</p>
+                </div>
+                <div>
+                    <h2>Astra - Biometric</h2>
+                    <p>Attendance Scheme</p>
+                </div>
+            </div>
+            <div class="process-table mt-2">
+                <h5 class="mb-4">Processed on</h5>
+                <table class="">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>First In</th>
+                            <th>Last Out</th>
+                            <th>Late In	Early Out</th>
+                            <th>Total Work Hrs</th>
+                            <th>Shortfall Hrs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="status-table mt-2">
+                <h3 class="mb-4">Status Details</h3>
+                <table class="">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Status</th>
+                            <th>Remarks</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="session-table mt-2">
+            <h4 class="mb-4">Session Details</h4>
+            <table class="">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Session</th>
+                        <th>Session Timing</th>
+                        <th>First In</th>
+                        <th>Last Out</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Session 1</td>
+                        <td>09:30 - 13:30</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Session 2</td>
+                        <td>14:31 - 18:30</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+            
+
+
+
+
+        </div>
+    </div>
+ </div>
+  
+</div>
+<footer>
+    v6.3.0-prod-879 | <a href="#">Privacy Policy</a> | <a href="#">Terms Of Service</a>
+</footer>
+        
+
+    <script>
+ // Sidebar toggle functionality
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+}
+
+
+// Dropdown menu functionality (Only one submenu open at a time)
+document.querySelectorAll('.menu > li > a').forEach(item => {
+    item.addEventListener('click', function(e) {
+        const submenu = this.nextElementSibling; // Get the next sibling (submenu)
+        
+        // Check if the clicked item has a submenu
+        if (submenu && submenu.classList.contains('submenu')) {
+            e.preventDefault(); // Prevent the default link behavior
+
+            // Close all submenus except the one that was clicked
+            document.querySelectorAll('.submenu').forEach(sub => {
+                if (sub !== submenu) {
+                    sub.style.display = 'none'; // Close other submenus
+                }
+            });
+
+            // Toggle the visibility of the clicked submenu
+            submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+        }
+    });
+});
+
+    </script>
+<script>
+       var currentMonth = 0,
+    currentYear = 2015,
+    monthMap = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+
+var dayList = document.querySelector('.days');
+
+function addDayElement(date, container) {
+    var element = document.createElement('div');
+    element.classList.add('date');
+    if (date.getMonth() !== currentMonth) {
+        element.classList.add('out-of-scope');
+    }
+    element.textContent = date.getDate();
+    container.appendChild(element);
+}
+
+function getFirstLastDates(date) {
+    var startDate, endDate;
+    
+    // Get the first day (Monday) of the current month
+    startDate = new Date(date.getFullYear(), date.getMonth(), 1);
+    while (startDate.getDay() !== 1) {
+        startDate.setDate(startDate.getDate() - 1);
+    }
+
+    // Get the last day (Sunday) of the current month
+    endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    while (endDate.getDay() !== 0) {
+        endDate.setDate(endDate.getDate() + 1);
+    }
+
+    return [startDate, endDate];
+}
+
+function renderDays(dateRange) {
+    dayList.innerHTML = '';  // Clear the previous days
+    var startDate = dateRange[0],
+        endDate = dateRange[1],
+        currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+        addDayElement(currentDate, dayList);
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+}
+
+function loadCalendar(date) {
+    // Update month and year in the calendar header
+    document.querySelector('.headline .month').textContent = monthMap[currentMonth];
+    document.querySelector('.headline .year').textContent = currentYear;
+    
+    // Render the days in the calendar
+    renderDays(getFirstLastDates(date));
+}
+
+loadCalendar(new Date());
+
+// Event listener for selecting a date
+dayList.addEventListener('click', function(e) {
+    if (e.target.classList.contains('date')) {
+        var selected = document.querySelector('.date.selected');
+        if (selected) {
+            selected.classList.remove('selected');
+        }
+        e.target.classList.add('selected');
+    }
+});
+
+// Event listener for navigating to the previous month
+document.querySelector('.click-left').addEventListener('click', function() {
+    currentMonth--;
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+    loadCalendar(new Date(currentYear, currentMonth));
+});
+
+// Event listener for navigating to the next month
+document.querySelector('.click-right').addEventListener('click', function() {
+    currentMonth++;
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+    loadCalendar(new Date(currentYear, currentMonth));
+});
+
+
+</script>
+</body>
+</html>

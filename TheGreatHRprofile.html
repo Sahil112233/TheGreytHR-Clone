@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertical Sidebar Menu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <!-- Link to External CSS -->
+    <style>
+       /* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+}
+
+body {
+    background-color: #fff;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 200px;
+    background-color: #fff;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    box-shadow: 5px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    transition: transform 0.3s ease;
+}
+
+.sidebar.active {
+    z-index: 15;
+}
+
+/* Back Button Container */
+#sidebar .back {
+    position: absolute; 
+    display: none;
+    top: 30px;
+    left: 75%; /* Moves the button just outside the sidebar, adjust as needed */
+    transform: translateX(10px) translateY(-50%); /* Adjusts positioning */
+}
+
+/* Back Button Styles */
+#sidebar .back-btn {
+    background: transparent !important; /* Make the background transparent */
+    border: none !important; /* Remove the border */
+    padding: 10px; /* Add padding to give space around the icon */
+    cursor: pointer; /* Make the button clickable */
+}
+
+/* Ion Icon Styles */
+#sidebar .back-btn ion-icon {
+    font-size: 30px; /* Adjust the size of the icon */
+    color: red; /* Set the default color to red */
+    transition: color 0.3s ease, transform 0.3s ease; /* Smooth transition for color and hover effects */
+}
+
+/* Hover Effect for Ion Icon */
+#sidebar .back-btn:hover ion-icon {
+    color: green; /* Change icon color on hover */
+    transform: scale(1.1); /* Slightly increase the size of the icon on hover */
+}
+
+/* Active/Focus Effect */
+#sidebar .back-btn:active ion-icon,
+#sidebar .back-btn:focus ion-icon {
+    color: green; /* Lighter color when the button is clicked or focused */
+    transform: scale(0.9); /* Slightly shrink the icon when clicked */
+}
+
+
+
+.sidebar .logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar .logo-img {
+    width: 100%;
+    max-width: 150px;
+}
+
+.sidebar .user {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.sidebar .user img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.sidebar .menu {
+    list-style: none;
+    padding: 0;
+    max-height: 80vh;
+    overflow-y: scroll;
+}
+
+/* Hides the scrollbar in WebKit browsers (Chrome, Safari, Edge) */
+.sidebar .menu::-webkit-scrollbar {
+    display: none;
+}
+
+
+.submenu li{
+    list-style-type: none; 
+}
+
+
+.sidebar .menu li {
+    margin: 15px 0;
+}
+
+.sidebar .menu li a {
+    color: #677A8E;
+    text-decoration: none;
+    font-size: 15px;
+    padding-left: 5px;
+    display: block;
+    transition: color background 0.3s;
+}
+
+.sidebar .menu li a:hover {
+    font-weight: bold;
+    border-left: 2px solid #007bff;
+}
+
+.sidebar .submenu {
+    display: none;
+    border-left: 1px solid #677A8E;
+    margin-left: 20px;
+    padding-left: 20px;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 200px; /* Adjust margin to sidebar width */
+    width: calc(100% - 200px); /* Full width minus sidebar width */
+    transition: margin-left 0.3s ease;
+}
+
+/* Header Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 5;
+}
+
+.menu-toggle-btn {
+    font-size: 30px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: none;
+}
+
+.right-menu {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+}
+
+.right-menu .quick-links {
+    position: relative;
+}
+
+.right-menu .quick-links .dropdown-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 20px;
+}
+
+.right-menu .quick-links .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 10;
+}
+
+.right-menu .quick-links:hover .dropdown-menu {
+    display: block;
+}
+
+.right-menu .notification {
+    margin-left: 20px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.right-menu .logout {
+    margin-left: 20px;
+}
+
+.right-menu .logout a {
+    font-size: 20px;
+    color: #677A8E;
+    cursor: pointer;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.right-menu .logout a:hover {
+    font-weight: bold;
+}
+
+/* Content Container Styles */
+/* General Content Container Styles */
+#content {
+    padding: 20px;
+    width: calc(100% - 200px); /* Adjust for sidebar width */
+    margin-left: 180px; /* Ensures it starts after the sidebar width */
+    margin-top: 30px; /* Below the header */
+    height: 100%; /* Full-screen height minus header height */
+}
+    
+/* Content Container Inner Styles */
+#content-container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%; /* Ensures it takes the full width inside #content */
+    height: 100%; /* Takes the remaining height of #content */
+}
+
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-250px); /* Sidebar hidden on small screens */
+    }
+
+    .sidebar.active {
+        transform: translateX(0); /* Show sidebar when active */
+    }
+
+    .header {
+        width: 100%;
+    }
+
+    .main-content {
+        margin-left: 0; /* Remove margin-left on smaller screens */
+    }
+
+    .menu-toggle-btn {
+        display: block; /* Show the menu toggle button */
+    }
+
+    #sidebar .back{
+        display: block;
+    }
+    #content {
+        
+        margin-left: 0; /* No margin-left on small screens */
+        width: 100%; /* Full width content */
+    }
+    #content-container{
+        display: flex;
+        flex-wrap: wrap;
+    }
+}
+
+    </style>
+    
+    <style>
+         /* Left div styles */
+         #left-div {
+            flex: 0 0 20%;
+            padding-top: 70px;
+            height: auto;
+            overflow-y: auto;
+        }
+
+        /* Right div styles */
+        #right-div {
+            flex: 1;
+            /* background-color: #c7ebfd; */
+            border-radius: 20px;
+            padding: 20px;
+            height: auto;
+            min-height: 200px;
+            overflow-y: auto;
+        }
+
+        .table-head{
+            background-color: #166087;
+        }       
+        .table-head h5{
+            color: #fff;
+            padding-top: 10px;
+            padding-left: 10px;
+        }
+        .toggle-btn {
+            background: transparent; 
+            border: none; 
+            padding: 0; 
+            cursor: pointer; 
+            display: inline-flex;
+            align-items: center; 
+            justify-content: center; 
+        }
+
+        /* Style for the ion-icon */
+        .toggle-btn ion-icon {
+            padding-top: 10px;
+            padding-right: 10px;
+            font-size: 25px; 
+            color: #fff; 
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        /* Hover effect for the icon */
+        .toggle-btn:hover ion-icon {
+            color: #fff; /* Change icon color on hover */
+            font-weight: bold;
+        }
+
+
+        .col-4 {
+            flex: 1 1 33%;  /* Ensure the columns take 1/3rd of the container */
+            box-sizing: border-box;
+        }
+
+        /* Make layout responsive */
+        @media (max-width: 768px) {
+            #left-div {
+                flex: 0 0 100%;
+            }
+            .left-list{
+                position: relative !important;
+            }
+            #right-div {
+                flex: 0 0 100%;
+            }
+        }
+
+        /* List and link styling */
+        .left-list {
+            list-style: none;
+            position: fixed;
+            padding: 0;
+        }
+
+        .left-list li {
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .left-list li:hover {
+            font-weight: bold;
+            transition: font-weight 0.3s;
+        }
+
+        .active {
+            transition: border-left 0.3s;
+            /* background-color: #c7ebfd; */
+            font-weight: bold;
+            color: #166087;
+            border-top-left-radius: 10px; 
+            border-bottom-left-radius: 10px; 
+        }
+
+        .horizontal-links {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        .horizontal-links a {
+            font-weight: bold;
+            text-decoration: none;
+            color: #077bc4;
+        }
+
+        .horizontal-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Content box styling */
+        .content-body{
+            padding-top: 20px;
+        }
+        .content-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: height 0.3s ease;
+        }
+
+        .content-box h5 {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .content-box .toggle-btn {
+            float: right;
+            background: none;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+        }
+
+        .content-box .content-body {
+            display: none;
+            margin-top: 10px;
+        }
+
+        /* Initially hide the expanded content */
+        .collapsed .content-body {
+            display: none;
+        }
+
+        .expanded .content-body {
+            display: block;
+        }
+
+        .content-body {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .profile-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .profile-left {
+            flex: 0 0 120px;
+            text-align: center;
+        }
+
+        .profile-img {
+            width: 100%;
+            max-width: 120px;
+            height: auto;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .profile-location {
+            text-align: center;
+        }
+
+        .profile-location label {
+            font-weight: bold;
+            display: block;
+        }
+
+        .profile-location span {
+            display: block;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .profile-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .profile-info-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .info-column {
+            flex: 1;
+        }
+
+        .label {
+            font-size: 12px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .value {
+            color: #555;
+        }
+
+        .fw-bold.d-block {
+            font-size: 12px; /* Smaller font-size for spans inside labels with classes fw-bold and d-block */
+            color: #555;
+            font-weight: 500;
+        }
+
+                /* Table Styles */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            padding-top: 0;
+            /* background-color: #166087; */
+            border: 1px solid rgb(0, 153, 255);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgb(0, 153, 255);
+            font-size: 14px;
+        }
+
+        th {
+            /* background-color: #68a6c7; */
+            color: black;
+            font-weight: bold;
+        }
+        
+        td {
+            background-color: #fafafa;
+        }
+
+        /* Alternate Row Colors */
+        tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+
+        /* Table Hover Effect */
+        tbody tr:hover {
+            background-color: #e9f7fc;
+        }
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .profile-left {
+        flex: 0 0 100%;
+        margin-bottom: 20px;
+    }
+
+    .profile-right {
+        flex: 1;
+        text-align: center;
+    }
+
+    .profile-info-row {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .info-column {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .label {
+        font-size: 14px;
+    }
+
+    .value {
+        font-size: 16px;
+    }
+}
+    
+/* Styling for the dropdown container */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 200px;
+}
+
+/* Button styling */
+.dropdown-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.selected-item-text {
+    font-size: 14px;
+    color: #555;
+}
+
+/* Toggle icon styling */
+.toggle {
+    width: 16px;
+    height: 16px;
+}
+
+/* Dropdown container and body */
+.dropdown-container {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: none; /* Hide by default */
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+}
+
+/* Show the dropdown when the button is clicked */
+.dropdown-button[aria-expanded="true"] + .dropdown-container {
+    display: block;
+}
+
+/* Dropdown item styling */
+.dropdown-body {
+    padding: 10px;
+}
+
+.dropdown-item {
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.dropdown-item label {
+    margin-left: 8px;
+    font-size: 14px;
+}
+
+.dropdown-item input {
+    width: 16px;
+    height: 16px;
+}
+
+/* Styling when item is checked */
+.dropdown-item input:checked + label {
+    font-weight: bold;
+}
+
+/* Scrollbar styling */
+.dropdown-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dropdown-body::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 3px;
+}
+
+.dropdown-body::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
+.placeholder {
+    font-family: "Open Sans", sans-serif !important;
+    font-size: 0.875rem !important;
+    line-height: 1 !important;
+    --tw-text-opacity: 1 !important;
+    color: rgba(163, 179, 200, var(--tw-text-opacity)) !important;
+}
+
+.asset-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px; /* space below the table */
+}
+
+.asset-table th, .asset-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd; /* Border under each row */
+}
+
+.asset-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.asset-table tr:last-child td {
+    border-bottom: none; /* No border under the last row */
+}
+
+.asset-info td {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+
+/* Basic Styling */
+.content-body {
+    margin: 20px;
+    font-family: Arial, sans-serif;
+}
+
+
+
+/* Layout for Rows and Columns */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.col-4 {
+    width: 33.33%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.mb-3 {
+    margin-bottom: 1rem;
+}
+
+/* Form Inputs */
+.form-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Styling for previous employment */
+.info-row {
+    margin-bottom: 10px;
+}
+
+.info-column {
+    margin-bottom: 5px;
+}
+
+.label {
+    font-weight: bold;
+}
+
+.value {
+    margin-left: 5px;
+    color: #555;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    .col-4 {
+        width: 100%;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="header">
+            <!-- Menu toggle button -->
+            <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+        
+            <!-- Right-side menu with Quick Links, Notifications, and Logout -->
+            <div class="right-menu">
+                <!-- Quick Links dropdown button -->
+                <div class="quick-links">
+                    <button class="dropdown-btn">Quick Links ▼</button>
+                </div>
+        
+                <!-- Notifications icon -->
+                <div class="notification">
+                    <span><ion-icon name="notifications-outline"></ion-icon></span>
+                </div>
+        
+                <!-- Logout button -->
+                <div class="logout">
+                    <a href="GreatHRlogin.html"><ion-icon name="power-outline"></ion-icon></a>
+                </div>
+            </div>
+        </div>  
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <img src="./img/logoPRM.png" alt="Logo" class="logo-img">
+        </div>
+        <div class="back">
+            <button class="back-btn" onclick="toggleSidebar()">
+                <ion-icon name="arrow-back-circle-outline"></ion-icon>
+            </button>
+        </div>
+        <div class="flex flex-1 flex-col p-2x">
+            <!-- Profile Section -->
+            <div class="user px-2x pb-2x flex items-center" style="margin: 0;">
+                <img src="./img/profileimg.jpg" alt="Profile" width="40" height="40" style="border-radius: 50%; margin-right: 10px;">
+                <div class="flex-1" style="padding: 0;">
+                    <p class="text-center" style="font-size: 14px; margin-bottom: 0;">Hi Sahil</p>
+                    <a href="TheGreatHRprofile.html" class="text-center" style="font-size: 14px; margin-top: 0;">Visit Profile</a>
+                </div>
+                <a href="TheGreatHRSetting.html" style="font-size: 14px;">
+                    <ion-icon name="settings-outline"></ion-icon>
+                </a>
+            </div>
+        </div>
+        <ul class="menu">
+            <li><a href="TheGreatHRhome.html"><ion-icon name="home-outline"></ion-icon> Home</a></li>
+           
+            <li><a href="TheGreatHREngage.html"><ion-icon name="people-outline"></ion-icon> Engage</a></li>
+            
+            <li><a href="#"><ion-icon name="briefcase-outline"></ion-icon> My Worklife <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHrWorkLifekudo.html">Kudos</a></li>
+                    <li><a href="TheGreatHrWorklifeFeed.html">Feedback</a></li>
+                </ul>
+            </li>
+          
+            <li><a href="#"><ion-icon name="clipboard-outline"></ion-icon> To Do <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHrTodo.html">Review</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="wallet-outline"></ion-icon> Salary <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHRPayslips.html">Payslips</a></li>
+                    <li><a href="TheGreatHRYTD.html">YTD Reports</a></li>
+                    <li><a href="TheGreatHRITState.html">IT Statement</a></li>
+                    <li><a href="TheGreatHRITDeclaration.html">IT Declaration</a></li>
+                    <li><a href="TheGreatHRLoanAdvance.html">Loans and Advances</a></li>
+                    <li><a href="TheGreatHRReimbursement.html">Reimbursement</a></li>
+                    <li><a href="TheGreatHRProofOI.html">Proof Of Investment</a></li>
+                    <li><a href="TheGreatHRSalaryRevise.html">Salary Revision</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="bed-outline"></ion-icon> Leave <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHRLeaveApply.html">Leave Apply</a></li>
+                    <li><a href="TheGreatHRLeaveBalance.html">Leave Balances</a></li>
+                    <li><a href="TheGreatHRLeavecalender.html">Leave Calendar</a></li>
+                    <li><a href="TheGreatHRHolidayCalender.html">Holiday Calendar</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="pulse-outline"></ion-icon> Attendance <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHRAttendence.html">Attendance Info</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="document-text-outline"></ion-icon> Expense Claims</a></li>
+            <li><a href="TheGreatHRDocumentCenter.html"><ion-icon name="document-outline"></ion-icon> Document Center</a></li>
+            <li><a href="TheGreatHRHelpdesk.html"><ion-icon name="help-circle-outline"></ion-icon> Helpdesk</a></li>
+            <li><a href="TheGreatHRRequestHub.html"><ion-icon name="clipboard-outline"></ion-icon> Request Hub</a></li>
+            <li><a href="#"><ion-icon name="share-social-outline"></ion-icon> Workflow Delegates</a></li>
+        </ul>
+    </div>
+
+    <div class="content" id="content">
+
+        <div class="visit-profile-box" >
+            <div id="content-container" >
+                <!-- Left side - Navigation List -->
+                <div id="left-div">
+                    <ul class="left-list">
+                        <li onclick="showContent('personal', this)">Personal</li>
+                        <li onclick="showContent('accounts', this)">Accounts & Statutory</li>
+                        <li onclick="showContent('family', this)">Family</li>
+                        <li onclick="showContent('employment', this)">Employment & Job</li>
+                        <li onclick="showContent('documents', this)">Document</li>
+                        <li onclick="showContent('letters', this)">Letter</li>
+                        <li onclick="showContent('insurance', this)">Insurance Details</li>
+                    </ul>
+                </div>
+
+                <!-- Right side - Content Display -->
+                <div id="right-div">
+                    <!-- Personal Section -->
+                    <div id="personal" class="content-section" style="display:none;">
+                        <div class="horizontal-links" >
+                            <p>Jump To </p>
+                            <a href="#profile-box">Profile</a>
+                            <a href="#personal-info-box">Personal Info</a>
+                            <a href="#address-box">Address</a>
+                            <a href="#education-box">Education</a>
+                        </div>
+
+                        <!-- Profile Box -->
+                        <div class="content-box expanded" id="profile-box" >
+                            <div class="table-head">
+                                <h5>Profile</h5>
+                            <button class="toggle-btn" onclick="toggleContent('profile-box')">
+                                <ion-icon name="caret-up-circle-outline"></ion-icon>
+                            </button>
+                            </div>
+                            <div class="content-body" >
+                                <div class="row">
+                                    <!-- Left Side: Profile Image and Location -->
+                                    <div class="col-md-4 mb-3 text-center">
+                                        <img src="./img/profileimg.jpg" alt="Profile Image" class="img-fluid rounded-circle profile-img">
+                                        <div class="profile-location mt-3">
+                                            <span class="fw-bold">Location:</span>
+                                            <span>New York, USA</span>
+                                        </div>
+                                    </div>
+                        
+                                    <!-- Right Side: Employee Information -->
+                                    <div class="col-md-8">
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Employee Name:</span>
+                                                    <span>John Doe</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Employee ID:</span>
+                                                    <span>123456</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                        
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Company Email:</span>
+                                                    <span>john.doe@example.com</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Primary Contact No.:</span>
+                                                    <span>+1 (555) 123-4567</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                        
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Extension:</span>
+                                                    <span>112</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        
+
+                        <!-- Personal Info Box -->
+                        <div class="content-box expanded" id="personal-info-box">
+                            <div class="table-head">
+                                <h5>Personal Info</h5>
+                                <button class="toggle-btn" onclick="toggleContent('personal-info-box')">
+                                    <ion-icon name="caret-up-circle-outline"></ion-icon>
+                                </button>
+                            </div>
+                            
+                            <div class="content-body">
+                                <div class="row">
+                                    <!-- Left Side: Personal Details -->
+                                    <div class="col-md-6">
+                                        <!-- Personal Details -->
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Blood Group:</span>
+                                                    <span>O+</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Date of Birth:</span>
+                                                    <span>17 NOV 2002</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Nationality:</span>
+                                                    <span>Indian</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Marital Status:</span>
+                                                    <span>Single</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Marriage Date:</span>
+                                                    <span>—</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Spouse:</span>
+                                                    <span>—</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Place of Birth:</span>
+                                                    <span>—</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Residential Status:</span>
+                                                    <span>—</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- New Personal Info -->
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Reporting Location:</span>
+                                                    <span>New York</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Joining Location:</span>
+                                                    <span>San Francisco</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Joining Date:</span>
+                                                    <span>01/01/2020</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Designation:</span>
+                                                    <span>Software Engineer</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Department:</span>
+                                                    <span>Engineering</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Gender:</span>
+                                                    <span>Male</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">PAN Number:</span>
+                                                    <span>ABCDE1234F</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Aadhar Number:</span>
+                                                    <span>1234 5678 9012</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">PF Number:</span>
+                                                    <span>ABC1234567</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">ESIC Number:</span>
+                                                    <span>ESIC123456789</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                        
+                                    <!-- Right Side: Additional Personal Details -->
+                                    <div class="col-md-6">
+                                        <!-- Additional Details -->
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Father's Name:</span>
+                                                    <span>Arun Nivrutti Sahane</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Religion:</span>
+                                                    <span>—</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Physically Challenged:</span>
+                                                    <span>No</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">International Employee:</span>
+                                                    <span>No</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Height:</span>
+                                                    <span>175 cm</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Weight:</span>
+                                                    <span>85 kg</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Identification Mark:</span>
+                                                    <span>—</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                        
+                                        <!-- New Additional Info -->
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Mobile Number:</span>
+                                                    <span>123-456-7890</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Alternate Mobile Number:</span>
+                                                    <span>987-654-3210</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Marital Status:</span>
+                                                    <span>Single</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Marriage Date:</span>
+                                                    <span>15/06/2015</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Nationality:</span>
+                                                    <span>American</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Religion:</span>
+                                                    <span>Christianity</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Personal Email ID:</span>
+                                                    <span>john.doe@example.com</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Alternate E-mail ID:</span>
+                                                    <span>johndoe.alt@example.com</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Driving License Number:</span>
+                                                    <span>DL1234567</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div>
+                                                    <span class="fw-bold d-block">Driving License Expiry:</span>
+                                                    <span>01/01/2025</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        
+                        
+
+                        <!-- Address Box -->
+                        <div class="content-box expanded" id="address-box">
+                            <div class="table-head">
+                                <h5>Address</h5>
+                            <button class="toggle-btn" onclick="toggleContent('address-box')">
+                                <ion-icon name="caret-up-circle-outline"></ion-icon>
+                            </button>
+                            </div>
+                            
+                            <div class="content-body">
+                                <div class="mb-3">
+                                    <label class="fw-bold d-block">Contact Address:</label>
+                                    <select class="form-select">
+                                        <option value="emergency-contact">Emergency Contact/Address</option>
+                                        <option value="permanent-address">Permanent Address</option>
+                                        <option value="present-address">Present Address</option>
+                                        <option value="spouse-address">Spouse Address</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="fw-bold d-block">Address:</label>
+                                    <span>—</span>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Name:</label>
+                                        <span>—</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Email:</label>
+                                        <span>—</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Phone 1:</label>
+                                        <span>—</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Phone 2:</label>
+                                        <span>—</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Mobile:</label>
+                                        <span>—</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Extension:</label>
+                                        <span>—</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Fax:</label>
+                                        <span>—</span>
+                                    </div>
+                                </div>
+                        
+                                
+                            </div>
+                        </div>
+                        <div class="content-box expanded" id="education-box">
+                            <div class="table-head">
+                                <h5>Education</h5>
+                            <button class="toggle-btn" onclick="toggleContent('education-box')">
+                                <ion-icon name="caret-up-circle-outline"></ion-icon>
+                            </button>
+                            </div>
+                            
+                            <div class="content-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Degree:</label>
+                                        <span>B.E</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Duration:</label>
+                                        <span>2022 - 2026</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label class="fw-bold d-block">Institute:</label>
+                                        <span>Met Bhujbal Knowledge City, Adgaon, Nashik</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Grade:</label>
+                                        <span>6.34</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- Accounts Section -->
+                    <div id="accounts" class="content-section" style="display:none;">
+                        <div class="horizontal-links">
+                            <p>Jump To </p>
+                            <a href="#bank-box">Bank Account</a>
+                            <a href="#esi-box">ESI Nomination</a>
+                            <a href="#epf-box">EPF Nomination</a>
+                            <a href="#gratuity-box">Gratuity Nomination</a>
+                            <a href="#ids-box">Other IDs</a>
+                        </div>
+
+                        <!-- Bank Account Box -->
+                        <div class="content-box expanded" id="bank-box">
+                            <div class="table-head">
+                                <h5>Bank Account</h5>
+                            <button class="toggle-btn" onclick="toggleContent('bank-box')">
+                                <ion-icon name="caret-up-circle-outline"></ion-icon>
+                            </button>
+                            </div>
+                            
+                            <div class="content-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Bank Name:</label>
+                                        <span>HDFC Bank</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Bank Account Number:</label>
+                                        <span>50100777895240</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Bank Branch:</label>
+                                        <span>Boat Club Road</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">IFSC:</label>
+                                        <span>HDFC0000039</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Account Type:</label>
+                                        <span>Salary Account</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Payment Type:</label>
+                                        <span>—</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">DD Payable At:</label>
+                                        <span>—</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Name As Per Bank Records:</label>
+                                        <span>Sahil Arun Sahane</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                        <!-- PF Account Box -->
+                        <!-- ESI Nomination -->
+                                <div class="content-box expanded" id="esi-box">
+                                    <div class="table-head">
+                                        <h5>ESI</h5>
+                                    <button class="toggle-btn" onclick="toggleContent('esi-box')">
+                                        <ion-icon name="caret-up-circle-outline"></ion-icon>
+                                    </button>
+                                    </div>
+                                    
+                                    <div class="content-body">
+                                        <table class="table table-bordered">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th class="nominee-name-column">Name in Full of Nominee</th>
+                                                    <th class="relation-column">Relation</th>
+                                                    <th class="dob-column">Date of Birth</th>
+                                                    <th class="blood-group-column">Blood Group</th>
+                                                    <th class="proportion-column">Proportion by which the ESI will be shared</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td id="nominee2FullName"></td>
+                                                    <td id="nominee2Relation"></td>
+                                                    <td id="nominee2Dob"></td>
+                                                    <td id="nominee2BloodGroup"></td>
+                                                    <td id="nominee2Proportion"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- EPF Nomination -->
+                                <div class="content-box expanded" id="epf-box">
+                                    <div class="table-head">
+                                        <h5>EPF</h5>
+                                    <button class="toggle-btn" onclick="toggleContent('epf-box')">
+                                        <ion-icon name="caret-up-circle-outline"></ion-icon>
+                                    </button>
+                                    </div>
+                                    
+                                    <div class="content-body">
+                                        <table class="table table-bordered">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th class="nominee-name-column">Name in Full of Nominee</th>
+                                                    <th class="relation-column">Relation</th>
+                                                    <th class="dob-column">Date of Birth</th>
+                                                    <th class="blood-group-column">Blood Group</th>
+                                                    <th class="proportion-column">Proportion by which the EPF will be shared</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td id="nominee3FullName"></td>
+                                                    <td id="nominee3Relation"></td>
+                                                    <td id="nominee3Dob"></td>
+                                                    <td id="nominee3BloodGroup"></td>
+                                                    <td id="nominee3Proportion"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Gratuity Nomination -->
+                                <div class="content-box expanded" id="gratuity-box">
+                                    <div class="table-head">
+                                        <h5>GRATUITY</h5>
+                                    <button class="toggle-btn" onclick="toggleContent('gratuity-box')">
+                                        <ion-icon name="caret-up-circle-outline"></ion-icon>
+                                    </button>
+                                    </div>
+                                    
+                                    <div class="content-body">
+                                        <table class="table table-bordered">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th class="nominee-name-column">Name in Full of Nominee</th>
+                                                    <th class="relation-column">Relation</th>
+                                                    <th class="dob-column">Date of Birth</th>
+                                                    <th class="blood-group-column">Blood Group</th>
+                                                    <th class="proportion-column">Proportion by which the Gratuity will be shared</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td id="nominee4FullName"></td>
+                                                    <td id="nominee4Relation"></td>
+                                                    <td id="nominee4Dob"></td>
+                                                    <td id="nominee4BloodGroup"></td>
+                                                    <td id="nominee4Proportion"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                        <!-- Other IDs Box -->
+                        <div class="content-box expanded" id="ids-box">
+                            <div class="table-head">
+                                <h5>Other IDs</h5>
+                            <button class="toggle-btn" onclick="toggleContent('ids-box')">
+                                <ion-icon name="caret-up-circle-outline"></ion-icon>
+                            </button>
+                            </div>
+                            
+                            <div class="content-body">
+                                <!-- AADHAAR Section -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">AADHAAR:</label>
+                                        <span>************</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Status:</label>
+                                        <span class="text-warning">Unverified</span>
+                                    </div>
+                                </div>
+                        
+                                <!-- Bank Details for Identification -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Bank Details for Identification:</label>
+                                        <span>50100777895240</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Status:</label>
+                                        <span class="text-success">Verified</span>
+                                    </div>
+                                </div>
+                        
+                                <!-- Permanent Account Number (PAN) Section -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Permanent Account Number:</label>
+                                        <span>PCMPS4777M</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Status:</label>
+                                        <span class="text-warning">Unverified</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- Family Section -->
+                    <div id="family" class="content-section" style="display:none;">
+                        <div class="horizontal-links">
+                            <p>Jump To </p>
+                            <a href="#father-box">Father</a>
+                            <a href="#mother-box">Mother</a>
+                            <a href="#nominations-box">Nominations</a>
+                        </div>
+
+                        <!-- Father Box -->
+                        <div class="content-box expanded" id="father-box">
+                            <div class="table-head">
+                                <h5>Father</h5>
+                            <button class="toggle-btn" onclick="toggleContent('father-box')">
+                                <ion-icon name="caret-up-circle-outline"></ion-icon>
+                            </button>
+                            </div>
+                            
+                            <div class="content-body">
+                                <!-- Father Information -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Name:</label>
+                                        <span>ARUN NIVRUTTI SAHANE</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Date of Birth:</label>
+                                        <span>14 Jul 1977 (47y)</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Blood Group:</label>
+                                        <span>O+</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Gender:</label>
+                                        <span>Male</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Nationality:</label>
+                                        <span>Indian</span>
+                                    </div>
+                                </div>
+                        
+                                <!-- Nomination Details -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">For Gratuity:</label>
+                                        <span>100%</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">For ESI:</label>
+                                        <span>100%</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">For EPS:</label>
+                                        <span>100%</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">For EPF:</label>
+                                        <span>100%</span>
+                                    </div>
+                                </div>
+                        
+                                <!-- Additional Details -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Additional:</label>
+                                        
+                                    </div>
+                                </div>
+                        
+                                <!-- Checkboxes for Minor and Mental Illness -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Minor: <a href="#">See details</a></label>
+                                        <input type="checkbox" id="minor" class="form-check-input"> Minor
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Mental Illness: <a href="#">See details</a></label>
+                                        <input type="checkbox" id="mental-illness" class="form-check-input"> Mental Illness
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                        <!-- Mother Box -->
+                        <div class="content-box expanded" id="mother-box">
+                            <div class="table-head">
+                                <h5>Mother</h5>
+                            <button class="toggle-btn" onclick="toggleContent('mother-box')">
+                                <ion-icon name="caret-up-circle-outline"></ion-icon>
+                            </button>
+                            </div>
+                            
+                            <div class="content-body">
+                                <!-- Mother Information -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Name:</label>
+                                        <span>VAISHALI ARUN SAHANE</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Date of Birth:</label>
+                                        <span>28 Apr 1983 (41y)</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Blood Group:</label>
+                                        <span>O+</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Gender:</label>
+                                        <span>Female</span>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Nationality:</label>
+                                        <span>Indian</span>
+                                    </div>
+                                </div>
+                        
+                                <!-- Nomination Details -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block">Nomination:</label>
+                                        <span>No data Found</span>
+                                    </div>
+                                </div>
+                        
+                                <!-- Additional Details -->
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label class="fw-bold d-block">Additional:</label>
+                                        <span><a href="#">See details</a></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                        <!-- Nominations Box -->
+                        <div class="content-box expanded" id="nominations-box">
+                            <div class="table-head">
+                                <h5>Nominations</h5>
+                            <button class="toggle-btn" onclick="toggleContent('nominations-box')">
+                                <ion-icon name="caret-up-circle-outline"></ion-icon>
+                            </button>
+                            </div>
+                            
+                            <div class="content-body">
+                                <textarea class="form-control" rows="5" placeholder="Enter Nominations..."></textarea>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- Employment Section -->
+                    <div id="employment" class="content-section" style="display:none;">
+                        <div class="horizontal-links">
+                            <p>Jump To</p>
+                            <a href="#current-position-box">Current Position</a>
+                            <a href="#previous-employment-box">Previous Employment</a>
+                        </div>
+                    
+                        <!-- Current Position Content -->
+                            <div class="content-box expanded" id="current-position-box">
+                                <div class="table-head">
+                                    <h5>Current Position</h5>
+                                <button class="toggle-btn" onclick="toggleContent('current-position-box')">
+                                    <ion-icon name="caret-up-circle-outline"></ion-icon>
+                                </button>
+                                </div>
+                                
+                                <div class="content-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="fw-bold d-block" for="attendance-timeline">View Timeline:</label>
+                                            <span id="attendance-timeline">Attendance Swipe Met...</span>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="fw-bold d-block" for="bio">Bio:</label>
+                                            <span id="bio">Cost Center</span>
+                                        </div>
+                                    </div>
+                                
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="fw-bold d-block" for="cost-center">Cost Center:</label>
+                                            <span id="cost-center">NA</span>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="fw-bold d-block" for="department">Department:</label>
+                                            <span id="department">Software Development</span>
+                                        </div>
+                                    </div>
+                                
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="fw-bold d-block" for="designation">Designation:</label>
+                                            <span id="designation">Front End Developer</span>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="fw-bold d-block" for="division">Division:</label>
+                                            <span id="division">NA</span>
+                                        </div>
+                                    </div>
+                                
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="fw-bold d-block" for="grade">Grade:</label>
+                                            <span id="grade">NA</span>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="fw-bold d-block" for="is-pms-eligible">Is PMS Eligible:</label>
+                                            <span id="is-pms-eligible">No</span>
+                                        </div>
+                                    </div>
+                                
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="fw-bold d-block" for="level">Level:</label>
+                                            <span id="level">NA</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                            </div>
+
+                            <!-- Previous Employment Content -->
+                            <div class="content-box expanded" id="previous-employment-box">
+                                <div class="table-head">
+                                    <h5>Previous Employment</h5>
+                                <button class="toggle-btn" onclick="toggleContent('previous-employment-box')">
+                                    <ion-icon name="caret-up-circle-outline"></ion-icon>
+                                </button>
+                                </div>
+                                
+                                <div class="content-body">
+                                    <div class="info-row">
+                                        <div class="info-column">
+                                            <span class="label">Company Name:</span>
+                                            <span class="value">Met Bhujbal Knowledge City</span>
+                                        </div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-column">
+                                            <span class="label">Designation:</span>
+                                            <span class="value">Front End Developer</span>
+                                        </div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-column">
+                                            <span class="label">Duration:</span>
+                                            <span class="value">01 Dec 2024 - 31 Dec 2024</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                    
+
+                    <!-- Assets Section -->
+                    <!-- Documents Section -->
+<div id="documents" class="content-section" style="display:none;">
+    <div class="horizontal-links">
+        <p>Jump To</p>
+        <a href="#checklist-box">Check List</a>
+        <a href="#qualification-documents-box">Qualification Documents</a>
+        <a href="#address-proof-box">Address Proof</a>
+        <a href="#other-documents-box">Other Documents</a>
+        <a href="#employer-documents-checklist-box">Employer Documents Check List (HR)</a>
+    </div>
+
+    <!-- Check List Box -->
+    <div class="content-box expanded" id="checklist-box">
+        <div class="table-head">
+            <h5>Check List</h5>
+            <button class="toggle-btn" onclick="toggleContent('checklist-box')">
+                <ion-icon name="caret-up-circle-outline"></ion-icon>
+            </button>
+        </div>
+        <div class="content-body">
+            <div class="table-container">
+                <table class="checklist-table-container">
+                    <thead>
+                        <tr class="thBg checklist-table-header">
+                            <th>Check List</th>
+                            <th>Document Copy</th>
+                            <th>Submission Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="checklist-table-row">
+                            <td>Resume/CV</td>
+                            <td><span id="resumeFile">No File</span></td>
+                            <td id="resumeDate">-</td>
+                        </tr>
+                        <tr class="checklist-table-row">
+                            <td>Assessment Result</td>
+                            <td><span id="assessmentFile">No File</span></td>
+                            <td id="assessmentDate">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Qualification Documents Box -->
+    <div class="content-box expanded" id="qualification-documents-box">
+        <div class="table-head">
+            <h5>Qualification Documents</h5>
+            <button class="toggle-btn" onclick="toggleContent('qualification-documents-box')">
+                <ion-icon name="caret-up-circle-outline"></ion-icon>
+            </button>
+        </div>
+        <div class="content-body">
+            <div class="table-container">
+                <table class="qualification-doc-table-container">
+                    <thead>
+                        <tr class="thBg qualification-doc-table-header">
+                            <th>Qualification Documents</th>
+                            <th>Document Copy</th>
+                            <th>Submission Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="qualification-doc-table-row">
+                            <td>10th Certificate</td>
+                            <td><span id="tenthFile">No File</span></td>
+                            <td id="tenthDate">-</td>
+                        </tr>
+                        <tr class="qualification-doc-table-row">
+                            <td>12th Certificate</td>
+                            <td><span id="twelfthFile">No File</span></td>
+                            <td id="twelfthDate">-</td>
+                        </tr>
+                        <tr class="qualification-doc-table-row">
+                            <td>Diploma Certificate</td>
+                            <td><span id="diplomaFile">No File</span></td>
+                            <td id="diplomaDate">-</td>
+                        </tr>
+                        <tr class="qualification-doc-table-row">
+                            <td>Bachelor Certificate</td>
+                            <td><span id="bachelorFile">No File</span></td>
+                            <td id="bachelorDate">-</td>
+                        </tr>
+                        <tr class="qualification-doc-table-row">
+                            <td>Master Certificate</td>
+                            <td><span id="masterFile">No File</span></td>
+                            <td id="masterDate">-</td>
+                        </tr>
+                        <tr class="qualification-doc-table-row">
+                            <td>Other Certificate</td>
+                            <td><span id="otherFile">No File</span></td>
+                            <td id="otherDate">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address Proof Box -->
+    <div class="content-box expanded" id="address-proof-box">
+        <div class="table-head">
+            <h5>Address Proof</h5>
+            <button class="toggle-btn" onclick="toggleContent('address-proof-box')">
+                <ion-icon name="caret-up-circle-outline"></ion-icon>
+            </button>
+        </div>
+        <div class="content-body">
+            <div class="table-container">
+                <table class="address-proof-table-container">
+                    <thead>
+                        <tr class="thBg address-proof-table-header">
+                            <th>Address Proof</th>
+                            <th>Document Copy</th>
+                            <th>Submission Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="address-proof-table-row">
+                            <td>Permanent Address Proof (Ration Card/Passport/Light Bill)</td>
+                            <td><span id="permanentAddressFile">No File</span></td>
+                            <td id="permanentAddressDate">-</td>
+                        </tr>
+                        <tr class="address-proof-table-row">
+                            <td>Current Address Proof (Light Bill/Rent Agreement)</td>
+                            <td><span id="currentAddressFile">No File</span></td>
+                            <td id="currentAddressDate">-</td>
+                        </tr>
+                        <tr class="address-proof-table-row">
+                            <td>Aadhar Card</td>
+                            <td><span id="aadharFile">No File</span></td>
+                            <td id="aadharDate">-</td>
+                        </tr>
+                        <tr class="address-proof-table-row">
+                            <td>PAN Card</td>
+                            <td><span id="panCardFile">No File</span></td>
+                            <td id="panCardDate">-</td>
+                        </tr>
+                        <tr class="address-proof-table-row">
+                            <td>Driving License</td>
+                            <td><span id="drivingLicenseFile">No File</span></td>
+                            <td id="drivingLicenseDate">-</td>
+                        </tr>
+                        <tr class="address-proof-table-row">
+                            <td>Ration Card</td>
+                            <td><span id="rationCardFile">No File</span></td>
+                            <td id="rationCardDate">-</td>
+                        </tr>
+                        <tr class="address-proof-table-row">
+                            <td>Election Card</td>
+                            <td><span id="electionCardFile">No File</span></td>
+                            <td id="electionCardDate">-</td>
+                        </tr>
+                        <tr class="address-proof-table-row">
+                            <td>Passport</td>
+                            <td><span id="passportFile">No File</span></td>
+                            <td id="passportDate">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Other Documents Box -->
+    <div class="content-box expanded" id="other-documents-box">
+        <div class="table-head">
+            <h5>Other Documents</h5>
+            <button class="toggle-btn" onclick="toggleContent('other-documents-box')">
+                <ion-icon name="caret-up-circle-outline"></ion-icon>
+            </button>
+        </div>
+        <div class="content-body">
+            <div class="table-container">
+                <table class="other-doc-table-container">
+                    <thead>
+                        <tr class="thBg other-doc-table-header">
+                            <th>Other Documents</th>
+                            <th>Document Copy</th>
+                            <th>Submission Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="other-doc-table-row">
+                            <td>Passport Size Photos</td>
+                            <td><span id="passportSizePhotosFile">No File</span></td>
+                            <td id="passportSizePhotosDate">-</td>
+                        </tr>
+                        <tr class="other-doc-table-row">
+                            <td>Bank Passbook/Cancelled Cheque</td>
+                            <td><span id="bankPassbookFile">No File</span></td>
+                            <td id="bankPassbookDate">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employer Documents Check List (HR) Box -->
+    <div class="content-box expanded" id="employer-documents-checklist-box">
+        <div class="table-head">
+            <h5>Employer Documents Check List (HR)</h5>
+            <button class="toggle-btn" onclick="toggleContent('employer-documents-checklist-box')">
+                <ion-icon name="caret-up-circle-outline"></ion-icon>
+            </button>
+        </div>
+        <div class="content-body">
+            <div class="table-container">
+                <table class="employee-doc-table-container">
+                    <thead>
+                        <tr class="employee-doc-table-header">
+                            <th>Employer Documents Check List (HR)</th>
+                            <th>Document Copy</th>
+                            <th>Submission Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="employee-doc-table-row">
+                            <td>Signed Offer Letter Copy</td>
+                            <td><span id="offerLetterFile">No File</span></td>
+                            <td id="offerLetterDate">-</td>
+                        </tr>
+                        <tr class="employee-doc-table-row">
+                            <td>Signed Appointment Letter Copy</td>
+                            <td><span id="appointmentLetterFile">No File</span></td>
+                            <td id="appointmentLetterDate">-</td>
+                        </tr>
+                        <tr class="employee-doc-table-row">
+                            <td>Signed SLA Copy</td>
+                            <td><span id="slaFile">No File</span></td>
+                            <td id="slaDate">-</td>
+                        </tr>
+                        <tr class="employee-doc-table-row">
+                            <td>Signed NDA Copy</td>
+                            <td><span id="ndaFile">No File</span></td>
+                            <td id="ndaDate">-</td>
+                        </tr>
+                        <tr class="employee-doc-table-row">
+                            <td>Signed Employee Information Form</td>
+                            <td><span id="employeeInfoFormFile">No File</span></td>
+                            <td id="employeeInfoFormDate">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+                        
+
+                    <!-- Insurance Section -->
+                    <div id="insurance" class="content-section" style="display:none;">
+                        <div class="content-box expanded" id="insurance-box">
+                            <div class="table-head">
+                                <h5>Insurance Details</h5>
+                            <button class="toggle-btn" onclick="toggleContent('insurance-box')">
+                                <ion-icon name="caret-up-circle-outline"></ion-icon>
+                            </button>
+                            </div>
+                            
+                            <div class="content-body">
+                                <p>Insurance Details Content</p>
+                            </div>
+                        </div>
+                    </div>
+
+<!-- Letter Section -->
+<div id="letters" class="content-section" style="display:none;">
+    <div class="horizontal-links">
+        <p>Jump To</p>
+        <a href="#letter-table-box">All Letters</a>
+    </div>
+    <div class="content-box expanded" id="letter-table-box">
+        <div class="table-head">
+            <h5>Letters</h5>
+            <button class="toggle-btn" onclick="toggleContent('letter-table-box')">
+                <ion-icon name="caret-up-circle-outline"></ion-icon>
+            </button>
+        </div>
+        <div class="content-body">
+            <div class="table-container">
+                <table class="letter-table-container">
+                    <thead>
+                        <tr class="letter-table-header">
+                            <th>Letter Title</th>
+                            <th>Letter Copy</th>
+                            <th>Issue Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="letter-table-row">
+                            <td>Offer Letter</td>
+                            <td>No File</td>
+                            <td>-</td>
+                        </tr>
+                        <tr class="letter-table-row">
+                            <td>Appointment Letter</td>
+                            <td>No File</td>
+                            <td>-</td>
+                        </tr>
+                        <tr class="letter-table-row">
+                            <td>Confirmation Letter</td>
+                            <td>No File</td>
+                            <td>-</td>
+                        </tr>
+                        <tr class="letter-table-row">
+                            <td>Relieving Letter</td>
+                            <td>No File</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+                </div>
+            </div>
+        </div>
+        </div>  
+        
+    </div>
+
+    <script >
+ // Sidebar toggle functionality
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+}
+
+
+// Dropdown menu functionality (Only one submenu open at a time)
+document.querySelectorAll('.menu > li > a').forEach(item => {
+    item.addEventListener('click', function(e) {
+        const submenu = this.nextElementSibling; // Get the next sibling (submenu)
+        
+        // Check if the clicked item has a submenu
+        if (submenu && submenu.classList.contains('submenu')) {
+            e.preventDefault(); // Prevent the default link behavior
+
+            // Close all submenus except the one that was clicked
+            document.querySelectorAll('.submenu').forEach(sub => {
+                if (sub !== submenu) {
+                    sub.style.display = 'none'; // Close other submenus
+                }
+            });
+
+            // Toggle the visibility of the clicked submenu
+            submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+        }
+    });
+});
+
+    </script>
+    <script>
+         // Function to show content based on the selected section
+         function showContent(section, element) {
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.style.display = 'none');
+    
+            const activeSection = document.getElementById(section);
+            if (activeSection) {
+                activeSection.style.display = 'block';
+            }
+    
+            // Remove active class from all list items
+            const listItems = document.querySelectorAll('.left-list li');
+            listItems.forEach(item => item.classList.remove('active'));
+    
+            // Add active class to the clicked list item
+            element.classList.add('active');
+        }
+    
+        // Function to toggle collapsed/expanded states
+        function toggleContent(boxId) {
+            const box = document.getElementById(boxId);
+            const body = box.querySelector('.content-body');
+            const icon = box.querySelector('ion-icon');
+    
+            if (box.classList.contains('collapsed')) {
+                box.classList.remove('collapsed');
+                box.classList.add('expanded');
+                icon.setAttribute('name', 'caret-up-circle-outline');
+            } else {
+                box.classList.remove('expanded');
+                box.classList.add('collapsed');
+                icon.setAttribute('name', 'caret-down-circle-outline');
+            }
+        }
+    
+        // Function to set the initial active content section
+        window.onload = function() {
+            // Make the first content section visible by default
+            const firstSection = document.querySelector('.content-section');
+            if (firstSection) {
+                firstSection.style.display = 'block';
+            }
+    
+            // Set the first list item as active
+            const firstListItem = document.querySelector('.left-list li');
+            if (firstListItem) {
+                firstListItem.classList.add('active');
+            }
+        };
+   
+    
+// Get elements
+// Select elements
+const dropdownButton = document.querySelector('.dropdown-button');
+const dropdownContainer = document.querySelector('.dropdown-container');
+const selectedItemText = document.querySelector('.selected-item-text');
+
+// Toggle dropdown visibility
+dropdownButton.addEventListener('click', () => {
+    const isExpanded = dropdownButton.getAttribute('aria-expanded') === 'true';
+    
+    // Toggle aria-expanded value
+    dropdownButton.setAttribute('aria-expanded', !isExpanded);
+    
+    // Toggle the visibility of the dropdown container
+    dropdownContainer.style.display = isExpanded ? 'none' : 'block';
+});
+
+// Update the selected item text
+const checkboxes = document.querySelectorAll('.dropdown-item input');
+checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+        const selectedValues = Array.from(checkboxes)
+            .filter(checkbox => checkbox.checked)
+            .map(checkbox => checkbox.nextElementSibling.textContent);
+
+        // Update selected text
+        if (selectedValues.length > 0) {
+            selectedItemText.textContent = selectedValues.join(', ');
+        } else {
+            selectedItemText.textContent = 'Select';
+        }
+    });
+});
+
+    </script>
+</body>
+</html>

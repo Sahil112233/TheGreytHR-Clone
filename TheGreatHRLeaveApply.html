@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertical Sidebar Menu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    
+    <!-- Link to External CSS -->
+    <style>
+       /* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+}
+
+body {
+    background-color: #fff;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 200px;
+    background-color: #fff;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    box-shadow: 5px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    transition: transform 0.3s ease;
+}
+
+.sidebar.active {
+    z-index: 15;
+}
+
+/* Back Button Container */
+#sidebar .back {
+    position: absolute; 
+    display: none;
+    top: 30px;
+    left: 75%; /* Moves the button just outside the sidebar, adjust as needed */
+    transform: translateX(10px) translateY(-50%); /* Adjusts positioning */
+}
+
+/* Back Button Styles */
+#sidebar .back-btn {
+    background: transparent !important; /* Make the background transparent */
+    border: none !important; /* Remove the border */
+    padding: 10px; /* Add padding to give space around the icon */
+    cursor: pointer; /* Make the button clickable */
+}
+
+/* Ion Icon Styles */
+#sidebar .back-btn ion-icon {
+    font-size: 30px; /* Adjust the size of the icon */
+    color: red; /* Set the default color to red */
+    transition: color 0.3s ease, transform 0.3s ease; /* Smooth transition for color and hover effects */
+}
+
+/* Hover Effect for Ion Icon */
+#sidebar .back-btn:hover ion-icon {
+    color: green; /* Change icon color on hover */
+    transform: scale(1.1); /* Slightly increase the size of the icon on hover */
+}
+
+/* Active/Focus Effect */
+#sidebar .back-btn:active ion-icon,
+#sidebar .back-btn:focus ion-icon {
+    color: green; /* Lighter color when the button is clicked or focused */
+    transform: scale(0.9); /* Slightly shrink the icon when clicked */
+}
+
+
+
+.sidebar .logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar .logo-img {
+    width: 100%;
+    max-width: 150px;
+}
+
+.sidebar .user {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.sidebar .user img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.sidebar .menu {
+    list-style: none;
+    padding: 0;
+    max-height: 80vh;
+    overflow-y: scroll;
+}
+
+.submenu li{
+    list-style-type: none; 
+}
+
+/* Hides the scrollbar in WebKit browsers (Chrome, Safari, Edge) */
+.sidebar .menu::-webkit-scrollbar {
+    display: none;
+}
+
+
+li::marker {
+    display: none;
+}
+
+
+.sidebar .menu li {
+    margin: 15px 0;
+}
+
+.sidebar .menu li a {
+    color: #677A8E;
+    text-decoration: none;
+    font-size: 15px;
+    padding-left: 5px;
+    display: block;
+    transition: color background 0.3s;
+}
+
+.sidebar .menu li a:hover {
+    font-weight: bold;
+    border-left: 2px solid #007bff;
+}
+
+.sidebar .submenu {
+    display: none;
+    border-left: 1px solid #677A8E;
+    margin-left: 20px;
+    padding-left: 20px;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 200px; /* Adjust margin to sidebar width */
+    width: calc(100% - 200px); /* Full width minus sidebar width */
+    transition: margin-left 0.3s ease;
+}
+
+/* Header Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 5;
+}
+
+.menu-toggle-btn {
+    font-size: 30px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: none;
+}
+
+.right-menu {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+}
+
+.right-menu .quick-links {
+    position: relative;
+}
+
+.right-menu .quick-links .dropdown-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 20px;
+}
+
+.right-menu .quick-links .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 10;
+}
+
+.right-menu .quick-links:hover .dropdown-menu {
+    display: block;
+}
+
+.right-menu .notification {
+    margin-left: 20px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.right-menu .logout {
+    margin-left: 20px;
+}
+
+.right-menu .logout a {
+    font-size: 20px;
+    color: #677A8E;
+    cursor: pointer;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.right-menu .logout a:hover {
+    font-weight: bold;
+}
+
+/* Content Container Styles */
+/* General Content Container Styles */
+#content {
+    padding: 20px;
+    width: calc(100% - 200px); /* Adjust for sidebar width */
+    margin-left: 180px; /* Ensures it starts after the sidebar width */
+    margin-top: 30px; /* Below the header */
+    height: 88vh;
+    
+    
+}
+    
+/* Content Container Inner Styles */
+#content-container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%; /* Ensures it takes the full width inside #content */
+    height: 100%; /* Takes the remaining height of #content */
+}
+
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-250px); /* Sidebar hidden on small screens */
+    }
+
+    .sidebar.active {
+        transform: translateX(0); /* Show sidebar when active */
+    }
+
+    .header {
+        width: 100%;
+    }
+
+    .main-content {
+        margin-left: 0; /* Remove margin-left on smaller screens */
+    }
+
+    .menu-toggle-btn {
+        display: block; /* Show the menu toggle button */
+    }
+
+    #sidebar .back{
+        display: block;
+    }
+    #content {
+        
+        margin-left: 0; /* No margin-left on small screens */
+        width: 100%; /* Full width content */
+    }
+    #content-container{
+        display: flex;
+        flex-wrap: wrap;
+    }
+}
+
+footer {
+            font-size: 12px;
+            background: transparent;
+            color: #7f8fa4;
+            text-align: center;
+            margin-bottom: 0;
+        }
+
+        footer a {
+            font-size: 12px;
+            color: #7f8fa4 ;
+            text-decoration: none;
+            margin: 0 ;
+        }   
+
+    </style>
+    
+ <style>
+    .button-container {
+            display: flex;
+            justify-content: center;      
+            margin-bottom: 20px;
+        }
+
+        .button-container button{
+            background-color: #fff;
+            color: #a3b2c7;
+            border: 1px solid #a3b2c7;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .button-container .btn-1{
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+        .button-container .btn-3{
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+
+
+        /* Button active style */
+        .button-container button.active {
+            background-color: #24A7f8;
+            color: white;
+            border: 1px solid #24A7f8;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+      
+        #content2, #content3 {
+            border: 1px solid #ccc;
+            padding: 20px;
+            background-color: #f9f9f9;
+            margin-top: 20px;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        #content2 img, #content3 img {
+            width: 20%;
+            margin-top: 80px;
+        }
+
+        #content2 h1, #content3 h1 {
+            color: #A3B2C7;
+            font-size: 20px;
+        }
+
+        #content2 p, #content3 p {
+            margin-top: 20px;
+            color: #A3B2C7;
+        }
+
+
+    </style>
+    <style>
+
+        /* Container for left and right content */
+        #content-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        /* Left div styles */
+        #left-div {
+            flex: 0 0 20%;
+            padding-top: 70px;
+            height: auto;
+            overflow-y: auto;
+        }
+
+        /* Right div styles */
+        #right-div {
+            flex: 1;
+            /* background-color: #c7ebfd; */
+            border-radius: 20px;
+            padding: 20px;
+            height: auto;
+            min-height: 200px;
+            overflow-y: auto;
+        }
+
+       
+
+
+        /* Make layout responsive */
+        @media (max-width: 768px) {
+            #left-div {
+                flex: 0 0 100%;
+            }
+
+            #right-div {
+                flex: 0 0 100%;
+            }
+        }
+
+        /* List and link styling */
+        .left-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .left-list li {
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .left-list li:hover {
+            font-weight: bold;
+            transition: font-weight 0.3s;
+        }
+
+        /* Left list active style */
+        .left-list li.active {
+            transition: border-left 0.3s;
+            /* background-color: #c7ebfd; */
+            font-weight: bold;
+            color: #166087;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+
+        .content-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: height 0.3s ease;
+        }
+    </style>
+    <style>
+        .note{
+            padding: 11px 13px;
+            align-items: center;
+            margin-bottom: 20px;
+            margin-top: 0;
+            background-color: #ffffEB;
+        }
+        .note p{
+            color: #3b4452;
+            font-size: 12px;
+        }
+        .note a{
+            color: #24a7f8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .content-box h1{
+            color: #3b4452;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Style for the label */
+        .form-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+
+        /* Required marker style */
+        .required-marker {
+            color: red;
+        }
+
+        /* Select container */
+        .select-container {
+            margin-top: 10px;
+        }
+
+        /* Style for the dropdown */
+        .select-box {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #495057;
+            box-sizing: border-box;
+        }
+
+        .select-box:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Style for the label */
+        .form-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+
+        /* Required marker style */
+        .required-marker {
+            color: red;
+        }
+
+
+
+        /* Style for the dropdown */
+        .select-box {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #495057;
+            box-sizing: border-box;
+        }
+
+        .select-box:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Form input styling */
+        .form-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #495057;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Responsive grid for form rows */
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .col-12 {
+            width: 100%;
+        }
+
+        .col-sm-6 {
+            width: 48%;
+        }
+
+        /* Margin for form groups */
+        .form-container {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+      
+        .select-apply img{
+            width: 5%;
+            
+            height: auto;
+        }
+        .select-apply a{
+            color: #7f8fa4;
+            margin-left: 10px;
+            padding-top: 10px;
+        }
+        .addcc{
+            margin-left: 6px;
+        }
+        .addcc ion-icon {
+            color: #7f8fa4;
+            font-size: 40px;
+        }
+       
+        .addcc:hover ion-icon {
+            
+            color: #24a7f8; 
+        }
+
+        .addcc p{
+            color: #7f8fa4;
+            margin-left: 10px;
+            padding-top: 10px;
+        }
+
+        .attachment{
+            display: flex;
+            gap: 20px;
+        }
+
+        .attachment a{
+            color: #7f8fa4;
+            font-size: 13px;
+            text-decoration: none;
+            
+        }
+
+        .attachment ion-icon {
+            color: #7f8fa4;
+            font-size: 30px;
+            
+        }
+       
+        .attachment:hover ion-icon {
+            
+            color: #24a7f8; 
+        }
+
+        .file-attach{
+            align-items: center;
+        }
+        .file-attach h2{
+            color: #7f8fa4;
+            font-size: 15px;
+        }
+        
+        .attachment p{
+            padding-top: 5px;
+            margin-bottom: 0;
+            color: #7f8fa4;
+            font-size: 15px;
+        }
+
+        .submit-cancel{
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .submit-cancel .btn-1{
+            color: #fff;
+            border-color: #24a7f8;
+            background: #24a7f8;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            min-height: 30px;
+            min-width: 85px;
+            padding: 7px 14px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .submit-cancel .btn-2{
+            color:#24a7f8 ;
+            border: #24a7f8 ;
+            border-radius: 4px;
+            min-height: 30px;
+            min-width: 85px;
+            padding: 7px 14px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .default-place {
+            
+            padding: 20px;
+            background-color: #f9f9f9;
+            margin-top: 20px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .default-place img {
+            width: 40%;
+            margin-top: 80px;
+        }
+
+        .default-place p {
+            margin-top: 20px;
+            color: #A3B2C7;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="header">
+            <!-- Menu toggle button -->
+            <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+        
+            <!-- Right-side menu with Quick Links, Notifications, and Logout -->
+            <div class="right-menu">
+                <!-- Quick Links dropdown button -->
+                <div class="quick-links">
+                    <button class="dropdown-btn">Quick Links ▼</button>
+                </div>
+        
+                <!-- Notifications icon -->
+                <div class="notification">
+                    <span><ion-icon name="notifications-outline"></ion-icon></span>
+                </div>
+        
+                <!-- Logout button -->
+                <div class="logout">
+                    <a href="GreatHRLogin.html"><ion-icon name="power-outline"></ion-icon></a>
+                </div>
+            </div>
+        </div>  
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <img src="./img/logoPRM.png" alt="Logo" class="logo-img">
+        </div>
+        <div class="back">
+            <button class="back-btn" onclick="toggleSidebar()">
+                <ion-icon name="arrow-back-circle-outline"></ion-icon>
+            </button>
+        </div>
+        <div class="flex flex-1 flex-col p-2x">
+            <!-- Profile Section -->
+            <div class="user px-2x pb-2x flex items-center" style="margin: 0;">
+                <img src="./img/profileimg.jpg" alt="Profile" width="40" height="40" style="border-radius: 50%; margin-right: 10px;">
+                <div class="flex-1" style="padding: 0;">
+                    <p class="text-center" style="font-size: 14px; margin-bottom: 0;">Hi Sahil</p>
+                    <a href="TheGreatHRprofile.html" class="text-center" style="font-size: 14px; margin-top: 0;">Visit Profile</a>
+                </div>
+                <a href="TheGreatHRSetting.html" style="font-size: 14px;">
+                    <ion-icon name="settings-outline"></ion-icon>
+                </a>
+            </div>
+        </div>
+        <ul class="menu">
+            <li><a href="TheGreatHRhome.html"><ion-icon name="home-outline"></ion-icon> Home</a></li>
+           
+            <li><a href="TheGreatHREngage.html"><ion-icon name="people-outline"></ion-icon> Engage</a></li>
+            
+            <li><a href="#"><ion-icon name="briefcase-outline"></ion-icon> My Worklife <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHrWorkLifekudo.html">Kudos</a></li>
+                    <li><a href="TheGreatHrWorklifeFeed.html">Feedback</a></li>
+                </ul>
+            </li>
+          
+            <li><a href="#"><ion-icon name="clipboard-outline"></ion-icon> To Do <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHrTodo.html">Review</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="wallet-outline"></ion-icon> Salary <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHRPayslips.html">Payslips</a></li>
+                    <li><a href="TheGreatHRYTD.html">YTD Reports</a></li>
+                    <li><a href="TheGreatHRITState.html">IT Statement</a></li>
+                    <li><a href="TheGreatHRITDeclaration.html">IT Declaration</a></li>
+                    <li><a href="TheGreatHRLoanAdvance.html">Loans and Advances</a></li>
+                    <li><a href="TheGreatHRReimbursement.html">Reimbursement</a></li>
+                    <li><a href="TheGreatHRProofOI.html">Proof Of Investment</a></li>
+                    <li><a href="TheGreatHRSalaryRevise.html">Salary Revision</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="bed-outline"></ion-icon> Leave <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHRLeaveApply.html">Leave Apply</a></li>
+                    <li><a href="TheGreatHRLeaveBalance.html">Leave Balances</a></li>
+                    <li><a href="TheGreatHRLeavecalender.html">Leave Calendar</a></li>
+                    <li><a href="TheGreatHRHolidayCalender.html">Holiday Calendar</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="pulse-outline"></ion-icon> Attendance <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHRAttendence.html">Attendance Info</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="document-text-outline"></ion-icon> Expense Claims</a></li>
+            <li><a href="TheGreatHRDocumentCenter.html"><ion-icon name="document-outline"></ion-icon> Document Center</a></li>
+            <li><a href="TheGreatHRHelpdesk.html"><ion-icon name="help-circle-outline"></ion-icon> Helpdesk</a></li>
+            <li><a href="TheGreatHRRequestHub.html"><ion-icon name="clipboard-outline"></ion-icon> Request Hub</a></li>
+            <li><a href="#"><ion-icon name="share-social-outline"></ion-icon> Workflow Delegates</a></li>
+        </ul>
+    </div>
+
+    <div class="content" id="content">
+        <div class="button-container">
+            <button class="btn-1" id="btn1">Apply</button>
+            <button class="btn-2" id="btn2">Pending</button>
+            <button class="btn-3" id="btn3">History</button>
+        </div>
+    
+        <div class="place-message">
+            <!-- content1 section (Initially visible) -->
+            <div class="contentno1" id="content1">
+                <div id="content-container">
+                    <!-- Left side - Navigation List -->
+                    <div id="left-div">
+                        <ul class="left-list">
+                            <li onclick="showContentFromList('leave', this)">Leave</li>
+                            <li onclick="showContentFromList('restrict', this)">Restricted Holiday</li>
+                            <li onclick="showContentFromList('leavecancel', this)">Leave Cancel</li>
+                            <li onclick="showContentFromList('compog', this)">Comp Off Grant</li>
+                        </ul>
+                    </div>
+    
+                    <!-- Right side - Content Display -->
+                    <div id="right-div">
+                        <div id="leave" class="content-section" style="display:none;">
+                            <div class="content-box">
+                                <div class="note d-flex justify-content-between">
+                                    <p>Leave is earned by an employee and granted by the employer to take time off work. The employee is free to avail this leave in accordance with the company policy.</p>
+                                    <a href="javascript:void(0);" id="hide-leave">Hide</a>
+                                </div>
+                                <div class="show-note d-none">
+                                    <a href="javascript:void(0);" id="info-leave">Show Info</a>
+                                </div>
+                                <h1>Applying for Leave</h1>
+                                <div class="d-flex gap-3">   
+                                    <div class="col-md-12 col-lg-9">
+                                        <div class="form-container">
+                                            <div class="form-group">
+                                                <label class="text-secondary required-field">
+                                                    Leave Type
+                                                    <span class="required-marker">*</span>
+                                                </label><br>
+                                                <select name="leaveType" required class="select-box">
+                                                    <option value="" disabled selected>Select Leave Type</option>
+                                                    <option value="lossOfPay">Loss Of Pay</option>
+                                                    <option value="compOff">Comp - Off</option>
+                                                    <option value="earnedLeave">Earned Leave</option>
+                                                    <option value="casualLeave">Casual Leave</option>
+                                                    <option value="officialDuty">On Official Duty</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-container">
+                                            <!-- First Row: Form Date and Session -->
+                                            <div class="form-group row">
+                                                <div class="col-12 col-sm-6 col-lg-9">
+                                                    <label class="text-secondary required-field">
+                                                        Form Date
+                                                        <span class="required-marker">*</span>
+                                                    </label><br>
+                                                    <input type="text" name="formDate" class="form-input" placeholder="MM/DD/YYYY" required />
+                                                </div>
+                                                <div class="col-12 col-sm-6 col-lg-9">
+                                                    <label class="text-secondary required-field">
+                                                        Session
+                                                        <span class="required-marker">*</span>
+                                                    </label><br>
+                                                    
+                                                        <select name="session" required class="select-box">
+                                                            <option value="" disabled selected>Select Session</option>
+                                                            <option value="session1">Session 1</option>
+                                                            <option value="session2">Session 2</option>
+                                                        </select>
+                                                
+                                                </div>
+                                            </div>
+                                        
+                                            <!-- Second Row: To Date -->
+                                            <div class="form-group row">
+                                                <div class="col-12 col-sm-6 col-lg-9">
+                                                    <label class="text-secondary required-field">
+                                                        To Date
+                                                        <span class="required-marker">*</span>
+                                                    </label><br>
+                                                    <input type="date" name="formDate" class="form-input" placeholder="MM/DD/YYYY" required />
+                                                </div>
+                                                <div class="col-12 col-sm-6 col-lg-9">
+                                                    <label class="text-secondary required-field">
+                                                        Session
+                                                        <span class="required-marker">*</span>
+                                                    </label><br>
+                                                    
+                                                        <select name="session" required class="select-box">
+                                                            <option value="" disabled selected>Select Session</option>
+                                                            <option value="session1">Session 1</option>
+                                                            <option value="session2">Session 2</option>
+                                                        </select>
+                                                
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center ">
+                                        <div class=" border-start p-3 ">
+                                        <label class="text-secondary required-field">
+                                            Leave Balance:
+                                        </label>
+                                        <span></span><br>
+                                        <label class="text-secondary required-field">
+                                            Applying For:
+                                        </label>
+                                        <span></span><br>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                <div class="select-apply d-flex">
+                                        <img src="./img/profileimg.jpg" alt="">                                   
+                                        <a href=""><p>Applying to ▼</p></a>                                  
+                                </div><br>         
+                                <div class="addcc d-flex" >
+                                    <ion-icon name="add-circle-outline"></ion-icon>
+                                    <p>Add</p>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-12 col-sm-6 ">
+                                        <label class="text-secondary required-field">
+                                            Contact details
+                                            <span class="required-marker">*</span>
+                                        </label><br>
+                                        <input type="number" name="" class="form-input" placeholder="" required />
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="form-group row">
+                                    <div class="col-12  ">
+                                        <label class="text-secondary required-field">
+                                            Reason
+                                            <span class="required-marker">*</span>
+                                        </label><br>
+                                        <input type="text" name="" class="form-input pb-4" placeholder="Enter a reason" required />
+                                    </div>
+                                </div>
+
+                                <div class="attachment">
+                                    <div class="file-attach d-flex">
+                                    <a href=""><ion-icon name="attach-outline"></ion-icon></a>
+                                    <h2 href="">Attach File</h2>
+                                    </div>
+                                    <p>File Types: pdf , xls , xlsx , doc , docx , txt , ppt , pptx , gif , jpg , jpeg , png</p>
+                                </div>
+                                <div class="submit-cancel">
+                                    <button type="button" class="btn-1 btn-sm">Submit</button>
+                                    <button type="button" class="btn-2 btn-sm">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    
+                        <div id="restrict" class="content-section" style="display:none;">
+                            <div class="content-box">
+                                <div class="note d-flex justify-content-between">
+                                    <p>Compensatory Off is additional leave granted as a compensation for working overtime or on an off day.</p>
+                                    <a href="javascript:void(0);" id="hide-restrict">Hide</a>
+                                </div>
+                                <div class="show-note d-none">
+                                    <a href="javascript:void(0);" id="info-restrict">Show Info</a>
+                                </div>
+                                <h1>Applying for Restricted Holiday</h1>
+                                <div class="default-place">
+                                    <img src="./img/review-list-empty.svg" alt="Payslip Image">
+                                    <p>It's empty here! Your pending leave requests will appear here.</p>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div id="leavecancel" class="content-section" style="display:none;">
+                            <div class="content-box">
+                                <div class="note d-flex justify-content-between">
+                                    <p>Compensatory Off is additional leave granted as a compensation for working overtime or on an off day.</p>
+                                    <a href="javascript:void(0);" id="hide-leavecancel">Hide</a>
+                                    
+                                </div>
+                                <div class="show-note d-none">
+                                    <a href="javascript:void(0);" id="info-leavecancel">Show Info</a>
+                                </div>
+                                <h1>Applying for Restricted Holiday</h1>
+                                <div class="default-place">
+                                    <img src="./img/review-list-empty.svg" alt="Payslip Image">
+                                    <p>It's empty here! Your pending leave requests will appear here.</p>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div id="compog" class="content-section" style="display:none;">
+                            <div class="content-box">
+                                <div class="note d-flex justify-content-between">
+                                    <p>Compensatory Off is additional leave granted as a compensation for working overtime or on an off day.</p>
+                                    <a href="javascript:void(0);" id="hide-compog">Hide</a>
+                                </div>
+                                <div class="show-note d-none">
+                                    <a href="javascript:void(0);" id="info-compog">Show Info</a>
+                                </div>
+                                <h1>Applying for Leave</h1>
+                                <div class="d-flex gap-3">   
+                                    <div class="col-md-12 col-lg-9">
+                                        <div class="form-container">
+                                            <div class="form-group">
+                                                <label class="text-secondary required-field">
+                                                    Leave Type
+                                                    <span class="required-marker">*</span>
+                                                </label><br>
+                                                <select name="leaveType" required class="select-box">
+                                                    <option value="" disabled selected>Select Leave Type</option>
+                                                    <option value="lossOfPay">Loss Of Pay</option>
+                                                    <option value="compOff">Comp - Off</option>
+                                                    <option value="earnedLeave">Earned Leave</option>
+                                                    <option value="casualLeave">Casual Leave</option>
+                                                    <option value="officialDuty">On Official Duty</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-container">
+                                            <!-- First Row: Form Date and Session -->
+                                            <div class="form-group row">
+                                                <div class="col-12 col-sm-6 col-lg-9">
+                                                    <label class="text-secondary required-field">
+                                                        Form Date
+                                                        <span class="required-marker">*</span>
+                                                    </label><br>
+                                                    <input type="text" name="formDate" class="form-input" placeholder="MM/DD/YYYY" required />
+                                                </div>
+                                                <div class="col-12 col-sm-6 col-lg-9">
+                                                    <label class="text-secondary required-field">
+                                                        Session
+                                                        <span class="required-marker">*</span>
+                                                    </label><br>
+                                                    
+                                                        <select name="session" required class="select-box">
+                                                            <option value="" disabled selected>Select Session</option>
+                                                            <option value="session1">Session 1</option>
+                                                            <option value="session2">Session 2</option>
+                                                        </select>
+                                                
+                                                </div>
+                                            </div>
+                                        
+                                            <!-- Second Row: To Date -->
+                                            <div class="form-group row">
+                                                <div class="col-12 col-sm-6 col-lg-9">
+                                                    <label class="text-secondary required-field">
+                                                        To Date
+                                                        <span class="required-marker">*</span>
+                                                    </label><br>
+                                                    <input type="date" name="formDate" class="form-input" placeholder="MM/DD/YYYY" required />
+                                                </div>
+                                                <div class="col-12 col-sm-6 col-lg-9">
+                                                    <label class="text-secondary required-field">
+                                                        Session
+                                                        <span class="required-marker">*</span>
+                                                    </label><br>
+                                                    
+                                                        <select name="session" required class="select-box">
+                                                            <option value="" disabled selected>Select Session</option>
+                                                            <option value="session1">Session 1</option>
+                                                            <option value="session2">Session 2</option>
+                                                        </select>
+                                                
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-12 col-sm-2 ">
+                                        <label class="text-secondary required-field">
+                                            Days
+                                            <span class="required-marker">*</span>
+                                        </label><br>
+                                        <input type="number" name="" class="form-input" placeholder="" required />
+                                    </div>
+                                </div>
+                                <div class="select-apply d-flex">
+                                        <img src="./img/profileimg.jpg" alt="">                                   
+                                        <a href=""><p>Applying to ▼</p></a>                                  
+                                </div><br>         
+                                <div class="addcc d-flex" >
+                                    <ion-icon name="add-circle-outline"></ion-icon>
+                                    <p>Add</p>
+                                </div>                                
+                                
+                                <div class="form-group row">
+                                    <div class="col-12  ">
+                                        <label class="text-secondary required-field">
+                                            Reason
+                                            <span class="required-marker">*</span>
+                                        </label><br>
+                                        <input type="text" name="" class="form-input pb-4" placeholder="Enter a reason" required />
+                                    </div>
+                                </div>
+
+                                <div class="attachment">
+                                    <div class="file-attach d-flex">
+                                    <a href=""><ion-icon name="attach-outline"></ion-icon></a>
+                                    <h2 href="">Attach File</h2>
+                                    </div>
+                                    <p>File Types: pdf , xls , xlsx , doc , docx , txt , ppt , pptx , gif , jpg , jpeg , png</p>
+                                </div>
+                                <div class="submit-cancel">
+                                    <button type="button" class="btn-1 btn-sm">Submit</button>
+                                    <button type="button" class="btn-2 btn-sm">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+    
+            <!-- content2 section (Pending) -->
+            <div class="contentno2" id="content2" style="display: none;">
+                <img src="./img/review-list-empty.svg" alt="Payslip Image">
+                <p>It's empty here! Your pending leave requests will appear here.</p>
+            </div>
+    
+            <!-- content3 section (History) -->
+            <div class="contentno3" id="content3" style="display: none;">
+                <img src="./img/review-list-empty.svg" alt="Payslip Image">
+                <p>There are no past records of any leave transactions made by you</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+ // Sidebar toggle functionality
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+}
+
+
+// Dropdown menu functionality (Only one submenu open at a time)
+document.querySelectorAll('.menu > li > a').forEach(item => {
+    item.addEventListener('click', function(e) {
+        const submenu = this.nextElementSibling; // Get the next sibling (submenu)
+        
+        // Check if the clicked item has a submenu
+        if (submenu && submenu.classList.contains('submenu')) {
+            e.preventDefault(); // Prevent the default link behavior
+
+            // Close all submenus except the one that was clicked
+            document.querySelectorAll('.submenu').forEach(sub => {
+                if (sub !== submenu) {
+                    sub.style.display = 'none'; // Close other submenus
+                }
+            });
+
+            // Toggle the visibility of the clicked submenu
+            submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+        }
+    });
+});
+
+    </script>
+<script>
+    // First script: Button-based content toggle
+    const btn1 = document.getElementById('btn1');
+    const btn2 = document.getElementById('btn2');
+    const btn3 = document.getElementById('btn3');
+    const content1 = document.getElementById('content1');
+    const content2 = document.getElementById('content2');
+    const content3 = document.getElementById('content3');
+
+    // Function to toggle content visibility and button active state
+    function showContentFromButtons(contentToShow, btnToActivate) {
+        // Hide all content sections
+        content1.style.display = 'none';
+        content2.style.display = 'none';
+        content3.style.display = 'none';
+
+        // Remove active class from all buttons
+        btn1.classList.remove('active');
+        btn2.classList.remove('active');
+        btn3.classList.remove('active');
+
+        // Show the selected content
+        contentToShow.style.display = 'block';
+
+        // Add active class to the clicked button
+        btnToActivate.classList.add('active');
+    }
+
+    // Event listeners for buttons
+    btn1.addEventListener('click', function() {
+        showContentFromButtons(content1, btn1);
+    });
+
+    btn2.addEventListener('click', function() {
+        showContentFromButtons(content2, btn2);
+    });
+
+    btn3.addEventListener('click', function() {
+        showContentFromButtons(content3, btn3);
+    });
+
+    // Set default active state and show the first content box
+    showContentFromButtons(content1, btn1);
+</script>
+
+<script>
+    // Second script: List item-based content toggle
+    function showContentFromList(sectionId, element) {
+        const sections = document.querySelectorAll('.content-section');
+        sections.forEach(section => section.style.display = 'none');
+
+        const activeSection = document.getElementById(sectionId);
+        if (activeSection) {
+            activeSection.style.display = 'block';
+        }
+
+        // Remove active class from all list items
+        const listItems = document.querySelectorAll('.left-list li');
+        listItems.forEach(item => item.classList.remove('active'));
+
+        // Add active class to the clicked list item
+        element.classList.add('active');
+    }
+
+    // Function to set the initial active content section
+    window.onload = function() {
+        // Make the first content section visible by default
+        const firstSection = document.querySelector('.content-section');
+        if (firstSection) {
+            firstSection.style.display = 'block';
+        }
+
+        // Set the first list item as active
+        const firstListItem = document.querySelector('.left-list li');
+        if (firstListItem) {
+            firstListItem.classList.add('active');
+        }
+    };
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    // Handle Hide and Show Info actions for each section
+    const sections = [
+        { hideId: "hide-leave", infoId: "info-leave" },
+        { hideId: "hide-restrict", infoId: "info-restrict" },
+        { hideId: "hide-leavecancel", infoId: "info-leavecancel" },
+        { hideId: "hide-compog", infoId: "info-compog" }
+    ];
+
+    sections.forEach(section => {
+        const hideLink = document.getElementById(section.hideId);
+        const infoLink = document.getElementById(section.infoId);
+
+        // Hide note and show "Show Info" link
+        hideLink.addEventListener("click", function() {
+            const sectionElement = hideLink.closest('.content-section');
+            sectionElement.querySelector('.note').style.display = 'none';
+            sectionElement.querySelector('.show-note').style.display = 'block';
+        });
+
+        // Show note and hide "Show Info" link
+        infoLink.addEventListener("click", function() {
+            const sectionElement = infoLink.closest('.content-section');
+            sectionElement.querySelector('.note').style.display = 'block';
+            sectionElement.querySelector('.show-note').style.display = 'none';
+        });
+    });
+});
+
+</script>
+
+</body>
+</html>

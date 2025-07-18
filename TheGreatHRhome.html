@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertical Sidebar Menu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <!-- Link to External CSS -->
+    <style>
+       /* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+}
+
+body {
+    background-color: #fff;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 200px;
+    background-color: #fff;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    box-shadow: 5px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    transition: transform 0.3s ease;
+}
+
+.sidebar.active {
+    z-index: 15;
+}
+
+/* Back Button Container */
+#sidebar .back {
+    position: absolute; 
+    display: none;
+    top: 30px;
+    left: 75%; /* Moves the button just outside the sidebar, adjust as needed */
+    transform: translateX(10px) translateY(-50%); /* Adjusts positioning */
+}
+
+/* Back Button Styles */
+#sidebar .back-btn {
+    background: transparent !important; /* Make the background transparent */
+    border: none !important; /* Remove the border */
+    padding: 10px; /* Add padding to give space around the icon */
+    cursor: pointer; /* Make the button clickable */
+}
+
+/* Ion Icon Styles */
+#sidebar .back-btn ion-icon {
+    font-size: 30px; /* Adjust the size of the icon */
+    color: red; /* Set the default color to red */
+    transition: color 0.3s ease, transform 0.3s ease; /* Smooth transition for color and hover effects */
+}
+
+/* Hover Effect for Ion Icon */
+#sidebar .back-btn:hover ion-icon {
+    color: green; /* Change icon color on hover */
+    transform: scale(1.1); /* Slightly increase the size of the icon on hover */
+}
+
+/* Active/Focus Effect */
+#sidebar .back-btn:active ion-icon,
+#sidebar .back-btn:focus ion-icon {
+    color: green; /* Lighter color when the button is clicked or focused */
+    transform: scale(0.9); /* Slightly shrink the icon when clicked */
+}
+
+
+
+.sidebar .logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar .logo-img {
+    width: 100%;
+    max-width: 150px;
+}
+
+.sidebar .user {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.sidebar .user img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.sidebar .menu {
+    list-style: none;
+    padding: 0;
+    max-height: 80vh;
+    overflow-y: scroll;
+}
+
+/* Hides the scrollbar in WebKit browsers (Chrome, Safari, Edge) */
+.sidebar .menu::-webkit-scrollbar {
+    display: none;
+}
+
+
+.submenu li{
+    list-style-type: none; 
+}
+
+.sidebar .menu li {
+    margin: 15px 0;
+}
+
+.sidebar .menu li a {
+    color: #677A8E;
+    text-decoration: none;
+    font-size: 15px;
+    padding-left: 5px;
+    display: block;
+    transition: color background 0.3s;
+}
+
+.sidebar .menu li a:hover {
+    font-weight: bold;
+    border-left: 2px solid #007bff;
+}
+
+.sidebar .submenu {
+    display: none;
+    border-left: 1px solid #677A8E;
+    margin-left: 20px;
+    padding-left: 20px;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 200px; /* Adjust margin to sidebar width */
+    width: calc(100% - 200px); /* Full width minus sidebar width */
+    transition: margin-left 0.3s ease;
+}
+
+/* Header Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 5;
+}
+
+.menu-toggle-btn {
+    font-size: 30px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: none;
+}
+
+.right-menu {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+}
+
+.right-menu .quick-links {
+    position: relative;
+}
+
+.right-menu .quick-links .dropdown-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 20px;
+}
+
+.right-menu .quick-links .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 10;
+}
+
+.right-menu .quick-links:hover .dropdown-menu {
+    display: block;
+}
+
+.right-menu .notification {
+    margin-left: 20px;
+    color: #677A8E;
+    font-size: 20px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.right-menu .logout {
+    margin-left: 20px;
+}
+
+.right-menu .logout a {
+    font-size: 20px;
+    color: #677A8E;
+    cursor: pointer;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.right-menu .logout a:hover {
+    font-weight: bold;
+}
+
+/* Content Container Styles */
+/* General Content Container Styles */
+#content {
+    padding: 20px;
+    width: calc(100% - 200px); /* Adjust for sidebar width */
+    margin-left: 180px; /* Ensures it starts after the sidebar width */
+    margin-top: 30px; /* Below the header */
+    height: 100%; /* Full-screen height minus header height */
+}
+    
+/* Content Container Inner Styles */
+#content-container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%; /* Ensures it takes the full width inside #content */
+    height: 100%; /* Takes the remaining height of #content */
+}
+
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-250px); /* Sidebar hidden on small screens */
+    }
+
+    .sidebar.active {
+        transform: translateX(0); /* Show sidebar when active */
+    }
+
+    .header {
+        width: 100%;
+    }
+
+    .main-content {
+        margin-left: 0; /* Remove margin-left on smaller screens */
+    }
+
+    .menu-toggle-btn {
+        display: block; /* Show the menu toggle button */
+    }
+
+    #sidebar .back{
+        display: block;
+    }
+    #content {
+        
+        margin-left: 0; /* No margin-left on small screens */
+        margin-right: 0;
+        width: 100%; /* Full width content */
+    }
+    #content-container{
+        display: flex;
+        flex-wrap: wrap;
+    }
+}
+
+    </style>
+    
+ <style>
+
+        /* Container with 2 divs side by side */
+        .container {
+            display: flex;
+            width: 100%;
+            height: auto;
+            justify-content: space-between;
+            margin-right: 0;
+            margin-top: 20px;
+            
+        }
+
+        .left {
+            flex: 1;
+            padding-right: 20px;
+        }
+
+        .right {
+            flex: 1;
+            padding-left: 510px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #394657;
+        }
+
+        .quote {
+            font-size: 16px;
+            font-style: italic;
+            color: #677A8E;
+            margin-top: 10px;
+        }
+
+        .quote-author {
+            font-size: 14px;
+            
+            text-align: left;
+        }
+
+        .right img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Second container with Unite & Explore */
+        .second-container {
+            width: 50%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        .new-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .new-container p {
+            font-size: 1rem;
+            color: #333;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-radius: 5px;
+        }
+
+        /* Styling for second-container */
+        .second-container {
+            width: 65%;
+            display: flex;
+            justify-content: center;  /* Centers the image horizontally */
+            align-items: center;      /* Centers the image vertically if the container has a height */
+        }
+
+        .second-container img {
+            max-width: 100%;          /* Ensures the image scales down responsively */
+            height: auto;             /* Maintains aspect ratio */
+            display: block;           /* Removes any bottom space caused by inline images */
+            border-radius: 8px;       /* Optional: Adds rounded corners to the image */
+        }
+
+        
+
+        /* Cards Section */
+        .card-container {
+            display: grid;                       /* Using grid for layout */
+            grid-template-columns: repeat(4, 1fr); /* 4 cards in a row */
+            gap: 16px;                            /* Space between cards */
+            padding: 20px;                        /* Padding around the card container */
+            box-sizing: border-box;               /* Ensure padding is included in width calculations */
+        }
+
+        /* Styling for individual card */
+
+/* Styling for the image inside the card */
+.card img {
+    width: 40%;                         /* Adjust image width */
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;                  /* Make image cover its container */
+    margin-bottom: 10px;                /* Add space below image */
+}
+
+/* Styling for the title inside the card */
+.card .title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #677A8E;                     /* Set title color */
+    margin: 10px 0;                     /* Add margin above and below title */
+    align-self: flex-start;             /* Align title to the left */
+    text-align: left;                   /* Align text to the left */
+}
+
+/* Styling for the description inside the card */
+.card .desc {
+    font-size: 1rem;                    /* Regular font size for description */
+    color: #555;                        /* Slightly darker text color for readability */
+    margin-top: 8px;                    /* Margin between title and description *               /* Keep description centered */
+}
+
+#card1{
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;                     /* Enable flexbox for layout */
+    flex-direction: column;            /* Stack elements vertically */
+    align-items: center;               /* Center content horizontally */
+    max-width: 100%;
+}
+#card1 img{
+    
+    width: 67px;
+    height: 80px;
+}
+
+
+#card2 {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;                     /* Enable flexbox for layout */
+    flex-direction: column;            /* Stack elements vertically */
+    align-items: center;               /* Center content horizontally */
+    max-width: 100%;
+}
+
+.card2-head{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.card2-head .arrow ion-icon{
+    font-size: 25px;
+}
+
+/* Description inside card2 */
+#card2 .desc {
+   font-size: 12px;
+   color: #333;                            /* Darker text color for readability */
+   margin-top: 10px;
+   
+}
+/* Styling for the span inside the list items in card2 */
+#card2 .desc li span {
+    font-size: 14px;                    /* Set the font size of the span */
+    color: #555;                        /* Optional: Set a color for the span text */
+    font-weight: bold;                  /* Optional: Make the span text bold */
+}
+
+/* Remove bullet points and reset padding */
+#card2 .desc ul {
+    list-style-type: none;             /* Remove bullet points */
+    padding-left: 0;                   /* Remove any indentation */
+    margin: 0;                         /* Remove any extra margin */
+}
+
+#card2 .desc li {
+    font-size: 14px;
+    color: #555;                       /* Slightly lighter color for the list items */
+    margin-bottom: 8px;                /* Space between list items */
+}
+
+#card3 {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;                     /* Enable flexbox for layout */
+    flex-direction: column;            /* Stack elements vertically */
+    align-items: center;               /* Center content horizontally */
+    justify-content: space-between;
+    max-width: 100%;
+}
+#card4 {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;                     /* Enable flexbox for layout */
+    flex-direction: column;            /* Stack elements vertically */
+    align-items: center;               /* Center content horizontally */
+
+    max-width: 100%;
+}
+#card5 {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;                     /* Enable flexbox for layout */
+    flex-direction: column;            /* Stack elements vertically */
+    align-items: center;               /* Center content horizontally */
+    justify-content: space-between;
+    max-width: 100%;
+}
+#card6 {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;                     /* Enable flexbox for layout */
+    flex-direction: column;            /* Stack elements vertically */
+    align-items: center;               /* Center content horizontally */
+    max-width: 100%;
+}
+
+#card7 {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;                     /* Enable flexbox for layout */
+    flex-direction: column;            /* Stack elements vertically */
+    align-items: center;               /* Center content horizontally */
+    justify-content: space-between;
+    max-width: 100%;
+}
+#card4 .desc{
+    display: flex;
+}
+#card4 .dbit{
+    width: 70%;
+}
+#card4 .desc li{
+    list-style-type: none; 
+    font-size: 12px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+}
+#card4 .dcript{
+    font-size: 10px;
+}
+
+#card5 .contento{
+    display: flex;
+}
+#card5 img{
+    margin: 10px;
+}
+
+#card7 .desc{
+    display: flex;
+}
+#card7 .dbit{
+    width: 70%;
+}
+
+.card:hover {
+      transform: translateY(-5px);
+      transition: 0.3s;
+    }
+.card:hover {
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+        transform: translateY(-10px); /* Slightly lift the card */
+    }
+
+
+        @media screen and (max-width: 1200px) {
+            .card-container {
+                grid-template-columns: repeat(3, 1fr); /* 3 cards per row on medium screens */
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .card-container {
+                grid-template-columns: repeat(2, 1fr); /* 2 cards per row on smaller screens */
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .card-container {
+                grid-template-columns: 1fr; /* 1 card per row on very small screens */
+            }
+        }
+        /* Footer */
+        footer {
+            text-align: center;
+            font-size: 0.9rem;
+            margin-top: 40px;
+            color: #888;
+        }
+
+        footer a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .left, .right {
+        width: 100%;
+        text-align: center;
+    }
+    .right img {
+        max-width: 80%;
+    }
+
+    .card-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card {
+        width: 80%;
+        margin: 10px 0;
+    }
+
+    .unite-container {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .left h1 {
+        font-size: 1.5rem;
+    }
+
+    .quote {
+        font-size: 1rem;
+    }
+
+    .explore-btn {
+        padding: 8px 16px;
+    }
+}
+
+
+footer {
+            font-size: 12px;
+            background: transparent;
+            color: #7f8fa4;
+            text-align: center;
+        }
+
+        footer a {
+            font-size: 12px;
+            color: #7f8fa4 ;
+            text-decoration: none;
+            margin: 0 ;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="header">
+            <!-- Menu toggle button -->
+            <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+        
+            <!-- Right-side menu with Quick Links, Notifications, and Logout -->
+            <div class="right-menu">
+                <!-- Quick Links dropdown button -->
+                <div class="quick-links">
+                    <button class="dropdown-btn">Quick Links ▼</button>
+                </div>
+        
+                <!-- Notifications icon -->
+                <div class="notification">
+                    <span><ion-icon name="notifications-outline"></ion-icon></span>
+                </div>
+        
+                <!-- Logout button -->
+                <div class="logout">
+                    <a href="GreatHRlogin.html"><ion-icon name="power-outline"></ion-icon></a>
+                </div>
+            </div>
+        </div>  
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <img src="./img/logoPRM.png" alt="Logo" class="logo-img">
+        </div>
+        <div class="back">
+            <button class="back-btn" onclick="toggleSidebar()">
+                <ion-icon name="arrow-back-circle-outline"></ion-icon>
+            </button>
+        </div>
+        <div class="flex flex-1 flex-col p-2x">
+            <!-- Profile Section -->
+            <div class="user px-2x pb-2x flex items-center" style="margin: 0;">
+                <img src="./img/profileimg.jpg" alt="Profile" width="40" height="40" style="border-radius: 50%; margin-right: 10px;">
+                <div class="flex-1" style="padding: 0;">
+                    <p class="text-center" style="font-size: 14px; margin-bottom: 0;">Hi Sahil</p>
+                    <a href="TheGreatHRprofile.html" class="text-center" style="font-size: 14px; margin-top: 0;">Visit Profile</a>
+                </div>
+                <a href="TheGreatHRSetting.html" style="font-size: 14px;">
+                    <ion-icon name="settings-outline"></ion-icon>
+                </a>
+            </div>
+        </div>
+        <ul class="menu">
+            <li><a href="TheGreatHRhome.html"><ion-icon name="home-outline"></ion-icon> Home</a></li>
+           
+            <li><a href="TheGreatHREngage.html"><ion-icon name="people-outline"></ion-icon> Engage</a></li>
+            
+            <li><a href="#"><ion-icon name="briefcase-outline"></ion-icon> My Worklife <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHrWorkLifekudo.html">Kudos</a></li>
+                    <li><a href="TheGreatHrWorklifeFeed.html">Feedback</a></li>
+                </ul>
+            </li>
+          
+            <li><a href="#"><ion-icon name="clipboard-outline"></ion-icon> To Do <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHrTodo.html">Review</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="wallet-outline"></ion-icon> Salary <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHRPayslips.html">Payslips</a></li>
+                    <li><a href="TheGreatHRYTD.html">YTD Reports</a></li>
+                    <li><a href="TheGreatHRITState.html">IT Statement</a></li>
+                    <li><a href="TheGreatHRITDeclaration.html">IT Declaration</a></li>
+                    <li><a href="TheGreatHRLoanAdvance.html">Loans and Advances</a></li>
+                    <li><a href="TheGreatHRReimbursement.html">Reimbursement</a></li>
+                    <li><a href="TheGreatHRProofOI.html">Proof Of Investment</a></li>
+                    <li><a href="TheGreatHRSalaryRevise.html">Salary Revision</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="bed-outline"></ion-icon> Leave <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHRLeaveApply.html">Leave Apply</a></li>
+                    <li><a href="TheGreatHRLeaveBalance.html">Leave Balances</a></li>
+                    <li><a href="TheGreatHRLeavecalender.html">Leave Calendar</a></li>
+                    <li><a href="TheGreatHRHolidayCalender.html">Holiday Calendar</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="pulse-outline"></ion-icon> Attendance <ion-icon name="chevron-down-outline"></ion-icon></a>
+                <ul class="submenu">
+                    <li><a href="TheGreatHRAttendence.html">Attendance Info</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><ion-icon name="document-text-outline"></ion-icon> Expense Claims</a></li>
+            <li><a href="TheGreatHRDocumentCenter.html"><ion-icon name="document-outline"></ion-icon> Document Center</a></li>
+            <li><a href="TheGreatHRHelpdesk.html"><ion-icon name="help-circle-outline"></ion-icon> Helpdesk</a></li>
+            <li><a href="TheGreatHRRequestHub.html"><ion-icon name="clipboard-outline"></ion-icon> Request Hub</a></li>
+            <li><a href="#"><ion-icon name="share-social-outline"></ion-icon> Workflow Delegates</a></li>
+        </ul>
+    </div>
+
+    <div class="content" id="content">
+        <div class="container">
+            <div class="left">
+                <h1>Good Morning</h1>
+                <p class="quote">"The best way to predict the future is to create it."</p>
+                <p class="quote-author">- Peter Drucker</p>
+            </div>
+            <div class="right">
+                <img src="./img/home-noon.svg" alt="Placeholder Image">
+            </div>
+        </div>
+    
+        <div class="second-container">
+            <img src="./img/UniteTaxBanner.png" alt="">
+        </div>
+        
+    
+        <div class="card-container">
+            <div class="card" id="card1">
+                <div class="title">Loan</div>
+                <img src="./img/gt_illustration_6.svg" alt="Card Image">
+                
+                <div class="desc">Hurrah! You've nothing  to review.</div>
+            </div>
+            <div class="card" id="card2">
+                <div class="card2-head">
+                    <div class="title ">Upcoming Holidays</div>
+                    <div class="arrow"><ion-icon name="arrow-forward-outline"></ion-icon></div>
+                </div>
+            
+                <div class="desc">
+                    <ul>
+                        <li><span>26 Feb, Wednesday</span> Maha Shivratri</li>
+                        <li><span>14 Mar, Friday </span> Holi</li>
+                        <li><span>31 Mar, Monday </span> Ramzan</li>
+                        <li><span>01 May, Thursday </span> Maharashtra Day</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card" id="card3">
+                <div class="title">Insurance</div>
+                <img src="./img/gt_illustration_4.svg" alt="Card Image">
+                
+                <div class="desc">Uh oh! Your Payslip will show up here after the release of Payroll.</div>
+            </div>
+            <div class="card" id="card4">
+                <div class="title">Investments</div>
+                <div class="desc">
+                    <div class="dbit">
+                        <li>Reimbursement Payslip</li>
+                        <li>Loan Statement</li>
+                        <li>IT Statement</li>
+                        <li>YTD Reports</li>
+                        <li>YTD Reports</li>
+                    </div>
+                    <div class="dcript">Use quick access to view important salary details.</div>
+                </div>
+            </div>
+            <div class="card" id="card5">
+                <div class="title">POI</div>
+                <div class="contento">
+                <img src="./img/gt_illustration_25.svg" alt="Card Image">
+                
+                <div class="desc"> Hold on! You can submit your Proof of Investments (POI) once released.</div>
+                </div>
+            </div>
+            <div class="card" id="card6">
+                <div class="title">Track</div>
+                <img src="./img/gt_illustration_2.svg" alt="Card Image">
+                
+                <div class="desc">All good! You've nothing new to track.</div>
+            </div>
+            <div class="card" id="card7">
+                <div class="title">POI</div>
+                <div class="desc">
+                <div class="dbit">
+                <img src="./img/gt_illustration_24.svg" alt="Card Image">
+                </div>
+                <div class="dcript"> 
+                    Hold on! You can submit your Income Tax (IT) declaration once released.</div>
+                </div>
+            </div>
+        </div>
+        
+    
+        <footer>
+            v6.3.0-prod-879 | <a href="#">Privacy Policy</a> | <a href="#">Terms Of Service</a>
+        </footer>
+        
+    </div>
+
+    <script>
+ // Sidebar toggle functionality
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+}
+
+
+// Dropdown menu functionality (Only one submenu open at a time)
+document.querySelectorAll('.menu > li > a').forEach(item => {
+    item.addEventListener('click', function(e) {
+        const submenu = this.nextElementSibling; // Get the next sibling (submenu)
+        
+        // Check if the clicked item has a submenu
+        if (submenu && submenu.classList.contains('submenu')) {
+            e.preventDefault(); // Prevent the default link behavior
+
+            // Close all submenus except the one that was clicked
+            document.querySelectorAll('.submenu').forEach(sub => {
+                if (sub !== submenu) {
+                    sub.style.display = 'none'; // Close other submenus
+                }
+            });
+
+            // Toggle the visibility of the clicked submenu
+            submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+        }
+    });
+});
+
+    </script>
+
+</body>
+</html>
